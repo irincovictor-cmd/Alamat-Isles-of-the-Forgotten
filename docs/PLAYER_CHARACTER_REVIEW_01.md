@@ -1,6 +1,6 @@
 # Player Explorer — Candidate 01 Review
 
-**Status:** candidate reference only, **not yet approved**.  
+**Status:** **APPEARANCE APPROVED by project owner (2026-11-11)**; directional animations and exports are not yet production-ready.  
 **Source:** owner-supplied file `main character.gif` in project chat (2026-11-11).  
 **Binary asset in GitHub:** not yet uploaded; this document does **not** mean the GIF is present in the repository.
 
@@ -22,7 +22,7 @@
 
 ## Next asset checklist
 
-- [ ] Owner confirms candidate look
+- [x] Owner confirms candidate look (2026-11-11)
 - [ ] Source tool and commercial-use license recorded
 - [ ] Original GIF uploaded to `assets/concepts/player_explorer_candidate_01.gif`
 - [ ] Approved reference image at `assets/concepts/player_explorer_master.png`
@@ -32,3 +32,9 @@
 - [ ] In-game Phaser preview screenshot and QA approval
 
 **Claude note:** Never treat the three-view preview GIF as the final 4-direction walk sprite. Use placeholders until the final exports exist.
+
+## Appearance lock (approved)
+
+Use the owner-provided GIF as the single visual reference: dark short hair, dark teal/green adventure clothing, brown leather/canvas cross-body satchel, earthy trousers, brown boots, youthful traveler silhouette. Do not substitute a different face, hairstyle, color scheme, body proportions, or bag between views. The GIF shows a multi-view preview inside 128 × 128 frames, not one 64 × 64 frame per character view; the required sprite sheets still need authoring and alignment checks.
+
+**Asset state:** concept look approved; rights verification, original binary upload, 4-direction standalone frames and walking cycles remain pending. Claude may use geometry placeholders meanwhile.
