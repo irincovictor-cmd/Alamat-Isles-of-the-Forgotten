@@ -1,0 +1,78 @@
+{
+  "schema_version": "0.1",
+  "registry_status": "research_and_concepts_only",
+  "creatures": [
+    {
+      "id": "tikbalang",
+      "display_name": "Tikbalang",
+      "origin_type": "folklore_being",
+      "tradition_region": "Tagalog and documented regional accounts",
+      "source_urls": [
+        "https://www.aswangproject.com/tikbalang/"
+      ],
+      "research_status": "verified_reference",
+      "gameplay_status": "lore_only",
+      "visual_status": "not_started",
+      "notes": "Traditional name retained. Variations in anatomy by account; not automatically catchable."
+    },
+    {
+      "id": "bakunawa",
+      "display_name": "Bakunawa",
+      "origin_type": "folklore_being",
+      "tradition_region": "Visayan eclipse accounts",
+      "source_urls": [
+        "https://www.aswangproject.com/bakunawa/"
+      ],
+      "research_status": "verified_reference",
+      "gameplay_status": "lore_only",
+      "visual_status": "not_started",
+      "notes": "Moon/eclipses serpent. Specific modern dragon features not established in the earliest descriptions."
+    },
+    {
+      "id": "kapre",
+      "display_name": "Kapre",
+      "origin_type": "folklore_being",
+      "tradition_region": "regional attribution requires further research",
+      "source_urls": [
+        "https://www.aswangproject.com/creatures-mythical-beings-philippine-folklore-mythology/"
+      ],
+      "research_status": "needs_review",
+      "gameplay_status": "lore_only",
+      "visual_status": "not_started",
+      "notes": "Do not use invented replacement name Kapruno."
+    },
+    {
+      "id": "tarsilaw",
+      "display_name": "Tarsilaw",
+      "origin_type": "original_species",
+      "tradition_region": "original_fiction",
+      "source_urls": [],
+      "research_status": "original_concept",
+      "gameplay_status": "proposed_starter",
+      "visual_status": "not_started",
+      "notes": "Original concept inspired by tarsier habitat; name and design subject to approval."
+    },
+    {
+      "id": "agilunos",
+      "display_name": "Agilunos",
+      "origin_type": "original_species",
+      "tradition_region": "original_fiction",
+      "source_urls": [],
+      "research_status": "original_concept",
+      "gameplay_status": "proposed_starter",
+      "visual_status": "not_started",
+      "notes": "Original concept inspired by Philippine eagle; name and design subject to approval."
+    },
+    {
+      "id": "bagaon",
+      "display_name": "Bagaon",
+      "origin_type": "original_species",
+      "tradition_region": "original_fiction",
+      "source_urls": [],
+      "research_status": "original_concept",
+      "gameplay_status": "proposed_starter",
+      "visual_status": "not_started",
+      "notes": "Original volcanic creature concept, no claim of a corresponding traditional folkloric being."
+    }
+  ]
+}
