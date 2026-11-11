@@ -1,42 +1,72 @@
 # ALAMAT: Isles of the Forgotten
 
-**Status:** Pre-production / design documentation (no playable game yet)  
+**Status:** Playable HTML prototype + minimal Django API (auth/save)  
 **Style:** Modern HD pixel art, top-down 2D browser RPG  
-**Core stack (planned):** Django + Django REST Framework + Phaser + TypeScript  
-**Source-of-truth:** The Aswang Project, with article-level citations and regional attribution.
+**Core stack (planned long-term):** Django + DRF + Phaser + TypeScript  
+**Current playable client:** single-file HTML/JS prototype (no install required)  
+**Source-of-truth for folklore:** The Aswang Project, with article-level citations and regional attribution.
 
 ALAMAT is an original creature-collecting RPG set across a fictional Philippine-inspired archipelago. Explore settlements, forests, and coastlines; encounter beings inspired by Philippine wildlife and folklore; build bonds; and investigate an original supernatural disturbance called the **Lilim**.
 
 > Important: Traditional figures keep their documented names (e.g. **Tikbalang**, **Bakunawa**, **Kapre**). Original game species must be identified as original creations. The Aswang Project is a research reference, **not an art-asset library or blanket permission to reproduce its text/images**.
 
-## Start here (for Claude or another development agent)
+## Play now
 
-1. Read [CLAUDE.md](CLAUDE.md) for development expectations and handoff.
-2. Read [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) for game systems and MVP requirements.
-3. Read [docs/ART_STYLE_BIBLE.md](docs/ART_STYLE_BIBLE.md) before producing any artwork.
-4. Read [docs/FOLKLORE_POLICY.md](docs/FOLKLORE_POLICY.md) and [data/creature_registry.json](data/creature_registry.json) before adding creatures or lore.
-5. Read [docs/ASSET_PIPELINE.md](docs/ASSET_PIPELINE.md) for sprites, tiles and asset approval.
-6. Follow [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) in small tested milestones.
+1. Open **`alamat-prototype.html`** in a browser (or use GitHub Pages once that file is the site root / `index.html`).
+2. No Python/Django required for local playtesting.
+3. **F5** save / **F9** load use browser localStorage.
 
-## First playable vertical slice
+Full session notes: **[PROGRESS.md](PROGRESS.md)**  
+Backend setup: **[README_BACKEND.md](README_BACKEND.md)**
 
-- Account creation/login and saved progress
-- Lumina Village and a small traversable area of Balete Forest
-- 4-direction player movement, collisions, camera, NPC dialogue
-- Starter selection, one wild encounter, one turn-based battle
-- A Selyo-based bonding attempt, party/inventory persistence
-- Django authoritative persistence; Phaser display/input client
+### Prototype controls
 
-## Decisions that remain provisional
+| Key | Action |
+|-----|--------|
+| Arrows / WASD | Move |
+| E / Space / Enter | Interact |
+| P | Party menu |
+| X / Esc | Back |
+| F5 | Save |
+| F9 | Load |
+| F2 | Collision inspector |
 
-Working title, place names, original species names, narrative details, balance numbers, and finalized artworks. The art samples in chat are **not** approved or licensed project assets. No finished sprite sheets or maps are committed yet.
+### Vertical slice included
+
+- Lumina Village → Balete Forest → Ancient Shrine
+- Starter selection, wild encounters, turn-based battle
+- Trust + Selyo bonding, party (max 3), herbs, XP/levels
+- NPCs, dialogue, local save/load
+
+## Minimal Django API (optional)
+
+Auth + cloud save only. Not required to play the HTML prototype.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+
+- `GET /api/health/`
+- `POST /api/auth/register/` / `login/`
+- `GET|PUT /api/save/` (token auth)
+
+## Design docs (still authoritative for scope/lore)
+
+1. [CLAUDE.md](CLAUDE.md) — agent handoff
+2. [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md)
+3. [docs/ART_STYLE_BIBLE.md](docs/ART_STYLE_BIBLE.md)
+4. [docs/FOLKLORE_POLICY.md](docs/FOLKLORE_POLICY.md)
+5. [data/creature_registry.json](data/creature_registry.json)
+6. [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md)
 
 ## Research links
 
-- [Bikolano mythology](https://www.aswangproject.com/philippine-mythology/bikolano-mythology-beliefs/) (user-specified starting point)
-- [Philippine mythologies by cultural group](https://www.aswangproject.com/philippine-mythologies-by-cultural-group/)
+- [Bikolano mythology](https://www.aswangproject.com/philippine-mythology/bikolano-mythology-beliefs/)
+- [Mythologies by cultural group](https://www.aswangproject.com/philippine-mythologies-by-cultural-group/)
 - [Creatures compendium](https://www.aswangproject.com/creatures-mythical-beings-philippine-folklore-mythology/)
-- [Tikbalang source article](https://www.aswangproject.com/tikbalang/)
-- [Bakunawa source article](https://www.aswangproject.com/bakunawa/)
-
-Research details and licensing rules: [docs/FOLKLORE_POLICY.md](docs/FOLKLORE_POLICY.md).
+- [Tikbalang](https://www.aswangproject.com/tikbalang/)
+- [Bakunawa](https://www.aswangproject.com/bakunawa/)
