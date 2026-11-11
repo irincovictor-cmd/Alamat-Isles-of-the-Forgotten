@@ -1,31 +1,17 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ALAMAT: Isles of the Forgotten — Prototype</title>
-</head><body>
-<p id="s" style="font-family:system-ui;padding:2rem">Loading ALAMAT…</p>
-<script src="game-data-1.js"></script>
-<script src="game-data-2.js"></script>
+<html lang="en"><head><meta charset="utf-8"><title>ALAMAT loading</title></head>
+<body><p style="font-family:system-ui;padding:2rem">Loading ALAMAT…</p>
+<script src="ch0.js"></script>
+<script src="ch1.js"></script>
+<script src="ch2.js"></script>
+<script src="ch3.js"></script>
+<script src="ch4.js"></script>
+<script src="ch5.js"></script>
 <script>
-(async function() {
-  try {
-    const b64 = window.__ALAMAT_B64_1 + window.__ALAMAT_B64_2;
-    const bin = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-    let html;
-    if (window.DecompressionStream) {
-      const ds = new DecompressionStream("gzip");
-      const stream = new Response(bin).body.pipeThrough(ds);
-      html = await new Response(stream).text();
-    } else {
-      throw new Error("Browser missing DecompressionStream. Use Chrome/Edge/Firefox recent.");
-    }
-    document.open();
-    document.write(html);
-    document.close();
-  } catch (e) {
-    document.getElementById("s").textContent = "Failed to load game: " + e.message;
-    console.error(e);
-  }
+(function(){
+  var html = (window.__CH || []).join("");
+  if(!html){document.body.textContent="Missing game chunks.";return;}
+  document.open(); document.write(html); document.close();
 })();
 </script>
 </body></html>
