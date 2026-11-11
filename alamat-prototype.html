@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<<<<<<< HEAD
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ALAMAT: Isles of the Forgotten — Prototype</title>
@@ -285,7 +284,21 @@ async function battle(fid){S.busy=true;await fade(1);S.mode='battle';
    else{await say('Couldn’t escape!');if(!await foeAtk())res='lose'}}}
  if(res==='lose'){await say('You blacked out…');S.party.forEach(q=>{q.hp=q.max;q.dh=q.max})}
  await fade(1);if(res==='lose')loadMap(V,19,17,0);S.mode='world';B=null;await fade(0);S.busy=false}
-async function fade(to){while(Math.abs(S.fade-to)>.01){S.fade+=Math.sign(to-S.fade)*.09;await sleep(16)}S.fade=to}
+let fadeTarget=null;
+async function fade(to){
+  fadeTarget=to;
+  // Drive fade via the game loop (more reliable than a tight async while)
+  while(fadeTarget!==null&&Math.abs(S.fade-fadeTarget)>.02){
+    await sleep(16);
+  }
+  if(fadeTarget!==null){S.fade=fadeTarget;fadeTarget=null}
+}
+function tickFade(){
+  if(fadeTarget===null)return;
+  const d=fadeTarget-S.fade;
+  if(Math.abs(d)<.03){S.fade=fadeTarget;fadeTarget=null;return}
+  S.fade+=Math.sign(d)*.12;
+}
 
 /* ---------- party menu ---------- */
 async function openParty(){if(!S.party.length){S.msg={t:'No party yet. Talk to Ate Luz.',ttl:100};return}
@@ -309,15 +322,15 @@ async function openParty(){if(!S.party.length){S.msg={t:'No party yet. Talk to A
   else if(PARTY.mode==='summary'){if(a==='ok'||a==='back')PARTY.mode='list'}}}
 
 /* ---------- world ---------- */
-function loadMap(m,x,y,d){const p=S.p;S.map=m;S.mapId=m===V?'V':m===F?'F':'S';p.x=x;p.y=y;p.px=x*T;p.py=y*T;p.dir=d;p.mv=0;p.f=0}
-async function warp(e){if(S.busy&&S.fade>0)return;S.busy=true;const p=S.p;
+function loadMap(m,x,y,d){const p=S.p;S.map=m;S.mapId=m===V?'V':m===F?'F':'S';p.x=x;p.y=y;p.px=x*T;p.py=y*T;p.dir=d;p.mv=0;p.f=0;S.fade=0;fadeTarget=null}
+async function warp(e){if(S._warping)return;S._warping=true;S.busy=true;const p=S.p;
  try{
-  if(e.to==='F'&&!S.f.starter){await talk('',['You should speak with Ate Luz first. She’s on the plaza.']);p.y=1;p.py=T;p.dir=0;S.fade=0;S.busy=false;return}
-  if(e.to==='S'&&!S.f.bonded){await talk('',['The path feels sealed… Bond with a creature first.']);p.y=1;p.py=T;p.dir=0;S.fade=0;S.busy=false;return}
-  await fade(1);const dest=MAPS[e.to]||V;if(!dest||!dest.gl){S.fade=0;S.busy=false;S.msg={t:'Map failed to load.',ttl:120};return}
+  if(e.to==='F'&&!S.f.starter){await talk('',['You should speak with Ate Luz first. She’s on the plaza.']);p.y=1;p.py=T;p.dir=0;S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;return}
+  if(e.to==='S'&&!S.f.bonded){await talk('',['The path feels sealed… Bond with a creature first.']);p.y=1;p.py=T;p.dir=0;S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;return}
+  await fade(1);const dest=MAPS[e.to]||V;if(!dest||!dest.gl){S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;S.msg={t:'Map failed to load.',ttl:120};return}
   loadMap(dest,e.tx,e.ty,e.dir);await fade(0);
- }catch(err){console.error('warp error',err);S.fade=0;S.mode='world'}
- S.busy=false}
+ }catch(err){console.error('warp error',err);S.fade=0;fadeTarget=null;S.mode='world'}
+ S.busy=false;S._warping=false}
 function arrive(){const p=S.p,m=S.map;if(!m)return;
  const e=m.exits.find(q=>q.x===p.x&&q.y===p.y);if(e){warp(e);return}
  if(m.name==='Ancient Shrine'&&!S.f.shrine)S.f.shrine=true;
@@ -389,29 +402,33 @@ function drawTitle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#
  tx('F9 = Load save  ·  Prototype · placeholder art',W/2,460,'rgba(245,240,231,.7)',13,'center')}
 function drawMsg(){if(!S.msg)return;c.fillStyle='rgba(20,38,56,.85)';c.fillRect(W/2-140,H/2-24,280,48);tx(S.msg.t,W/2,H/2+6,P.off,16,'center')}
 function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
- try{update(dt)}catch(err){console.error('update',err)}
+ try{tickFade();update(dt)}catch(err){console.error('update',err)}
  c.clearRect(0,0,W,H);
+ // Always fill a light playfield under the world so a failed draw never looks like a black void
+ if(S.mode!=='title'){c.fillStyle='#1a3a4a';c.fillRect(0,0,W,H)}
  try{
   if(S.mode==='title')drawTitle();
   else if(S.mode==='battle'&&B)drawBattle();
-  else if(S.mode==='world'||S.mode==='battle'){if(S.mode==='battle'){S.mode='world';B=null}
+  else if(S.mode==='world'||S.mode==='battle'){if(S.mode==='battle'&&!B){S.mode='world'}
    if(S.map&&S.map.gl){drawWorld();drawDlg();drawPick();if(PARTY)drawParty()}
    else{c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Loading map…',W/2,H/2,P.off,20,'center')}}
   else{S.mode='world'}
   drawMsg();
-  if(S.fade>0){c.fillStyle='rgba(20,38,56,'+Math.min(1,S.fade)+')';c.fillRect(0,0,W,H)}
- }catch(err){console.error('draw',err);c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Draw error — press F9 to reload save',W/2,H/2,P.off,16,'center');S.fade=0}
+  if(S.fade>0.01){c.fillStyle='rgba(20,38,56,'+Math.min(1,S.fade)+')';c.fillRect(0,0,W,H)}
+ }catch(err){console.error('draw',err);c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Draw error — press F3 to reset',W/2,H/2,P.off,16,'center');S.fade=0;fadeTarget=null}
  requestAnimationFrame(frame)}
 
 /* ---------- input ---------- */
+function unstick(){S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;waiter=null;PARTY=null;DG=null;U=null;if(S.mode==='battle'&&!B)S.mode='world';S.msg={t:'State reset (F3)',ttl:90}}
 function dispatch(a){if(waiter){const w=waiter;waiter=null;w(a);return}
- if(S.mode==='title'&&a==='ok'){S.mode='world';return}
+ if(S.mode==='title'&&a==='ok'){S.mode='world';S.fade=0;fadeTarget=null;return}
  if(S.mode==='world'&&!S.busy&&!S.p.mv){if(a==='ok')interact();if(a==='party')openParty()}}
 const KM={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right',
  Enter:'ok',' ':'ok',e:'ok',z:'ok',Escape:'back',x:'back',Backspace:'back',p:'party',P:'party'};
 const kd=a=>{if(a in held)held[a]=1;dispatch(a)},ku=a=>{if(a in held)held[a]=0};
 addEventListener('keydown',e=>{
  if(e.key==='F2'){S.insp=!S.insp;e.preventDefault();return}
+ if(e.key==='F3'){e.preventDefault();unstick();return}
  if(e.key==='F5'){e.preventDefault();if(S.mode==='world'&&!S.busy)saveGame();return}
  if(e.key==='F9'){e.preventDefault();if(S.mode==='title'||(S.mode==='world'&&!S.busy))loadGame();return}
  const a=KM[e.key.length>1?e.key:e.key.toLowerCase()];if(a){e.preventDefault();if(!e.repeat||a in held||a==='up'||a==='down')kd(a)}});
@@ -433,25 +450,7 @@ const TESTS=[
  ['XP level-up increases stats',()=>{const c=mkC('agilunos',5);const a0=c.atk;gainXP(c,200);return c.lv>5&&c.atk>a0}]
 ];
 const res=TESTS.map(([n,f])=>{let ok=false;try{ok=!!f()}catch(e){}return[n,ok]});
-console.table(res);$('foot').textContent='Arrows/WASD · E/Space interact · P party · F5 save · F9 load · F2 inspector · Self-test '+res.filter(r=>r[1]).length+'/'+res.length+' passed';
+console.table(res);$('foot').textContent='Arrows/WASD · E interact · P party · F3 reset · F5 save · F9 load · Self-test '+res.filter(r=>r[1]).length+'/'+res.length+' passed';
 window.ALAMAT={S,V,F,SH,tests:res,saveGame,loadGame};requestAnimationFrame(frame);
 })();
 </script></body></html>
-=======
-<html lang="en"><head><meta charset="utf-8"><title>ALAMAT loading</title></head>
-<body><p style="font-family:system-ui;padding:2rem">Loading ALAMAT…</p>
-<script src="ch0.js"></script>
-<script src="ch1.js"></script>
-<script src="ch2.js"></script>
-<script src="ch3.js"></script>
-<script src="ch4.js"></script>
-<script src="ch5.js"></script>
-<script>
-(function(){
-  var html = (window.__CH || []).join("");
-  if(!html){document.body.textContent="Missing game chunks.";return;}
-  document.open(); document.write(html); document.close();
-})();
-</script>
-</body></html>
->>>>>>> 59d68bdbffd635e8d01bd740d5686df7327a9536
