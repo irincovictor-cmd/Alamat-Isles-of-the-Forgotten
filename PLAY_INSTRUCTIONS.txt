@@ -1,0 +1,12 @@
+Open alamat-prototype.html in your browser to play.
+
+If the HTML file is missing from this repo, download it from the project artifacts / chat session and place it here, then:
+
+  git add alamat-prototype.html index.html
+  git config user.email "you@example.com"
+  git config user.name "Your Name"
+  git commit -m "Add playable HTML prototype"
+  git push
+
+No Python or Django is required to play.
+Controls: Arrows/WASD move, E/Space interact, P party, F5 save, F9 load.
