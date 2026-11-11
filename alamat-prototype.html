@@ -16,10 +16,20 @@ body{background:var(--bg);color:var(--fg);font:14px "Trebuchet MS",system-ui,san
 #pad button{width:52px;height:52px;border-radius:50%;border:2px solid var(--fg);background:var(--ac);color:#f5f0e7;font:bold 18px system-ui;touch-action:none}
 @media (hover:none) and (pointer:coarse){#pad{display:flex}}
 #foot{margin:0;text-align:center;font-size:12px;opacity:.8;max-width:96vw}
+#bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;width:min(96vw,640px)}
+#bar button{border:2px solid var(--fg);background:var(--ac);color:#f5f0e7;font:bold 13px system-ui;padding:8px 14px;border-radius:8px;cursor:pointer}
+#bar button:hover{filter:brightness(1.1)}
+#bar button#btn-reset{background:#8B3A3A}
 </style></head><body>
 <canvas id="g" aria-label="ALAMAT prototype game canvas. Arrow keys or WASD to move, E or Space to interact, P for party."></canvas>
+<div id="bar">
+  <button type="button" id="btn-reset" title="Clear stuck screen / busy state">Reset view</button>
+  <button type="button" id="btn-party" title="Open party (P)">Party</button>
+  <button type="button" id="btn-save" title="Save (F5)">Save</button>
+  <button type="button" id="btn-load" title="Load (F9)">Load</button>
+</div>
 <div id="pad"><div class="dp"><button data-a="up">▲</button><button data-a="left">◀</button><button data-a="down">▼</button><button data-a="right">▶</button></div><div class="ab"><button data-a="back">B</button><button data-a="ok">A</button></div></div>
-<p id="foot">Arrows/WASD move · E/Space interact · P party · X/Esc back · F2 collision · F5 save · F9 load</p>
+<p id="foot">Arrows/WASD · E interact · P party · Reset view if stuck · F5 save · F9 load</p>
 <script>
 (()=>{'use strict';
 const T=32,W=640,H=480,$=i=>document.getElementById(i),cv=$('g'),c=cv.getContext('2d');cv.width=W;cv.height=H;c.imageSmoothingEnabled=false;
@@ -327,9 +337,17 @@ async function warp(e){if(S._warping)return;S._warping=true;S.busy=true;const p=
  try{
   if(e.to==='F'&&!S.f.starter){await talk('',['You should speak with Ate Luz first. She’s on the plaza.']);p.y=1;p.py=T;p.dir=0;S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;return}
   if(e.to==='S'&&!S.f.bonded){await talk('',['The path feels sealed… Bond with a creature first.']);p.y=1;p.py=T;p.dir=0;S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;return}
-  await fade(1);const dest=MAPS[e.to]||V;if(!dest||!dest.gl){S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;S.msg={t:'Map failed to load.',ttl:120};return}
-  loadMap(dest,e.tx,e.ty,e.dir);await fade(0);
- }catch(err){console.error('warp error',err);S.fade=0;fadeTarget=null;S.mode='world'}
+  const dest=MAPS[e.to]||V;
+  const placeName=(dest&&dest.name)||'somewhere new';
+  S.loading={name:placeName,phase:'out'};
+  await fade(1);
+  if(!dest||!dest.gl){S.loading=null;S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;S.msg={t:'Map failed to load.',ttl:120};return}
+  loadMap(dest,e.tx,e.ty,e.dir);
+  S.loading={name:placeName,phase:'in'};
+  await sleep(280);
+  await fade(0);
+  S.loading=null;
+ }catch(err){console.error('warp error',err);S.fade=0;fadeTarget=null;S.loading=null;S.mode='world'}
  S.busy=false;S._warping=false}
 function arrive(){const p=S.p,m=S.map;if(!m)return;
  const e=m.exits.find(q=>q.x===p.x&&q.y===p.y);if(e){warp(e);return}
@@ -401,10 +419,23 @@ function drawTitle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#
  if((S.t/500|0)%2)tx('Press Enter or tap to begin',W/2,430,P.off,20,'center');
  tx('F9 = Load save  ·  Prototype · placeholder art',W/2,460,'rgba(245,240,231,.7)',13,'center')}
 function drawMsg(){if(!S.msg)return;c.fillStyle='rgba(20,38,56,.85)';c.fillRect(W/2-140,H/2-24,280,48);tx(S.msg.t,W/2,H/2+6,P.off,16,'center')}
+function drawLoading(){
+  if(!S.loading)return;
+  c.fillStyle='rgba(13,24,35,.92)';c.fillRect(0,0,W,H);
+  const name=S.loading.name||'…';
+  tx('Traveling…',W/2,H/2-36,P.gold,22,'center');
+  tx(name,W/2,H/2+4,P.off,28,'center');
+  const dots='.'.repeat(1+((S.t/400)|0)%3);
+  tx('Please wait'+dots,W/2,H/2+40,'rgba(245,240,231,.7)',16,'center');
+  // simple progress bar
+  const bw=220,bh=8,bx=W/2-bw/2,by=H/2+64;
+  c.fillStyle=P.navy;c.fillRect(bx,by,bw,bh);
+  const prog=S.loading.phase==='out'?Math.min(1,S.fade):Math.max(0,1-S.fade);
+  c.fillStyle=P.teal;c.fillRect(bx,by,bw*prog,bh);
+}
 function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
  try{tickFade();update(dt)}catch(err){console.error('update',err)}
  c.clearRect(0,0,W,H);
- // Always fill a light playfield under the world so a failed draw never looks like a black void
  if(S.mode!=='title'){c.fillStyle='#1a3a4a';c.fillRect(0,0,W,H)}
  try{
   if(S.mode==='title')drawTitle();
@@ -415,13 +446,14 @@ function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
   else{S.mode='world'}
   drawMsg();
   if(S.fade>0.01){c.fillStyle='rgba(20,38,56,'+Math.min(1,S.fade)+')';c.fillRect(0,0,W,H)}
- }catch(err){console.error('draw',err);c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Draw error — press F3 to reset',W/2,H/2,P.off,16,'center');S.fade=0;fadeTarget=null}
+  drawLoading();
+ }catch(err){console.error('draw',err);c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Draw error — use Reset view',W/2,H/2,P.off,16,'center');S.fade=0;fadeTarget=null}
  requestAnimationFrame(frame)}
 
 /* ---------- input ---------- */
-function unstick(){S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;waiter=null;PARTY=null;DG=null;U=null;if(S.mode==='battle'&&!B)S.mode='world';S.msg={t:'State reset (F3)',ttl:90}}
+function unstick(){S.fade=0;fadeTarget=null;S.busy=false;S._warping=false;S.loading=null;waiter=null;PARTY=null;DG=null;U=null;if(S.mode==='battle'&&!B)S.mode='world';S.msg={t:'View reset',ttl:90}}
 function dispatch(a){if(waiter){const w=waiter;waiter=null;w(a);return}
- if(S.mode==='title'&&a==='ok'){S.mode='world';S.fade=0;fadeTarget=null;return}
+ if(S.mode==='title'&&a==='ok'){S.mode='world';S.fade=0;fadeTarget=null;S.loading=null;return}
  if(S.mode==='world'&&!S.busy&&!S.p.mv){if(a==='ok')interact();if(a==='party')openParty()}}
 const KM={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right',
  Enter:'ok',' ':'ok',e:'ok',z:'ok',Escape:'back',x:'back',Backspace:'back',p:'party',P:'party'};
@@ -435,6 +467,10 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>{const a=KM[e.key.length>1?e.key:e.key.toLowerCase()];if(a)ku(a)});
 document.querySelectorAll('#pad button').forEach(b=>{const a=b.dataset.a;b.addEventListener('pointerdown',e=>{e.preventDefault();kd(a)});for(const ev of['pointerup','pointerleave','pointercancel'])b.addEventListener(ev,()=>ku(a))});
 cv.addEventListener('pointerdown',()=>{if(S.mode==='title')dispatch('ok')});
+$('btn-reset').addEventListener('click',()=>unstick());
+$('btn-party').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)openParty()});
+$('btn-save').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)saveGame()});
+$('btn-load').addEventListener('click',()=>{if(S.mode==='title'||(S.mode==='world'&&!S.busy))loadGame()});
 
 /* ---------- self-tests ---------- */
 const TESTS=[
@@ -450,7 +486,7 @@ const TESTS=[
  ['XP level-up increases stats',()=>{const c=mkC('agilunos',5);const a0=c.atk;gainXP(c,200);return c.lv>5&&c.atk>a0}]
 ];
 const res=TESTS.map(([n,f])=>{let ok=false;try{ok=!!f()}catch(e){}return[n,ok]});
-console.table(res);$('foot').textContent='Arrows/WASD · E interact · P party · F3 reset · F5 save · F9 load · Self-test '+res.filter(r=>r[1]).length+'/'+res.length+' passed';
+console.table(res);$('foot').textContent='Arrows/WASD · E · Party · Reset view · Save/Load · Self-test '+res.filter(r=>r[1]).length+'/'+res.length+' passed';
 window.ALAMAT={S,V,F,SH,tests:res,saveGame,loadGame};requestAnimationFrame(frame);
 })();
 </script></body></html>
