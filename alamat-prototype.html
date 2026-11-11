@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ALAMAT: Isles of the Forgotten — Prototype</title>
@@ -436,3 +437,21 @@ console.table(res);$('foot').textContent='Arrows/WASD · E/Space interact · P p
 window.ALAMAT={S,V,F,SH,tests:res,saveGame,loadGame};requestAnimationFrame(frame);
 })();
 </script></body></html>
+=======
+<html lang="en"><head><meta charset="utf-8"><title>ALAMAT loading</title></head>
+<body><p style="font-family:system-ui;padding:2rem">Loading ALAMAT…</p>
+<script src="ch0.js"></script>
+<script src="ch1.js"></script>
+<script src="ch2.js"></script>
+<script src="ch3.js"></script>
+<script src="ch4.js"></script>
+<script src="ch5.js"></script>
+<script>
+(function(){
+  var html = (window.__CH || []).join("");
+  if(!html){document.body.textContent="Missing game chunks.";return;}
+  document.open(); document.write(html); document.close();
+})();
+</script>
+</body></html>
+>>>>>>> 59d68bdbffd635e8d01bd740d5686df7327a9536
