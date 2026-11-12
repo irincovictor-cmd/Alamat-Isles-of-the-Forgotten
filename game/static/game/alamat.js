@@ -76,6 +76,28 @@ function drawObject(ctx,o,x,y){
    return;
   }
  }
+ // Optional Quiet Village buildings atlas. Preserve existing collision footprint,
+ // interaction points, and map coordinates while swapping only the visual.
+ if(o.spr.assetKey==='buildings/house'){
+  const sheet=asset('environment/buildings/quiet_village',null);
+  if(sheet&&sheet.width>=1227&&sheet.height>=1067){
+   // [source x, source y, source width, source height] from Buildings.png.
+   // Locations are stable so each village landmark keeps its own roof style.
+   const houseArt={
+    '6,6':[14,568,85,92],    // protagonist's home: red
+    '26,4':[115,465,155,92], // research centre: blue extended house
+    '5,18':[115,865,155,92], // healer: green extended house
+    '12,6':[14,1,85,92],     // neighbor: charcoal
+    '33,19':[14,668,85,92]  // neighbor: olive
+   };
+   const crop=houseArt[o.x+','+o.y];
+   if(crop){
+    ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(sheet,...crop,Math.round(x),Math.round(y),o.spr.width,o.spr.height);
+    return;
+   }
+  }
+ }
  const key=o.spr.assetKey;
  const img=key?asset('environment/'+key,o.spr):o.spr;
  ctx.drawImage(img,x,y,o.spr.width,o.spr.height);
