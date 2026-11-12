@@ -23,8 +23,8 @@
 | 005 | Lumot | Bloom (Nature) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 006 | Pakpak | Shadow | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 007 | Bato | Stone (Earth) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
-| 008 | Dagat | Tide (Water) | No | No | No | No | Placeholder | Not started |
-| 009 | Kidlatin | Spark | No | No | No | No | Placeholder | Not started |
+| 008 | Dagat | Tide (Water) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 009 | Kidlatin | Spark | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 010 | Silong | Shadow | No | No | No | No | Placeholder | Not started |
 | 011 | Arawan | Light | No | No | No | No | Placeholder | Not started |
 | 012 | Ugbok | Stone (Earth) | No | No | No | No | Placeholder | Not started |
@@ -32,9 +32,27 @@
 | 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
 | 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 
-**Current counts:** 7 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon, Alitaptap, Lumot, Pakpak and Bato); 0 of 15 are verified fully complete across all views. **8 creatures remain without prepared designs.**
+**Current counts:** 9 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon, Alitaptap, Lumot, Pakpak, Bato, Dagat and Kidlatin); 0 of 15 are verified fully complete across all views. **6 creatures remain without prepared designs.**
 
 ## Approved art notes
+
+### #008 Dagat
+
+- **Reference:** user-provided `DAGAT(1).png` (256×256 transparent 4×4 pose sheet, 64×64 cells).
+- **Approved design:** cyan-blue amphibious sea guardian with pale cream belly, fin ears, bright blue eyes and a curled wave-like tail.
+- **Battle front/menu:** row 1 column 1. **Battle back:** row 3 column 1.
+- **Package:** [Alamat_Dagat_Battle_Assets.zip](https://drive.google.com/file/d/14-K3ZuOFlpiKxYd6r73ZaoBDkUSwKtBv/view) in the Google Drive Alamat Game Assets folder.
+- **Paths:** `game/static/game/assets/creatures/dagat/battle/front.png`, `battle/back.png`, `menu.png`.
+- **Status:** prepared and packaged; local installation, battle/Menu/Dex verification and overworld art pending. No need to regenerate.
+
+### #009 Kidlatin
+
+- **Reference:** user-provided `KIDLATIN(1).png` (256×256 transparent 4×4 pose sheet, 64×64 cells).
+- **Approved design:** small deep-navy electric runner with yellow lightning markings, cyan eyes, pointed ears and bright zigzag sparks.
+- **Battle front/menu:** row 1 column 1. **Battle back:** row 3 column 1.
+- **Package:** [Alamat_Kidlatin_Battle_Assets.zip](https://drive.google.com/file/d/1FccR0FSzYYDpp4XxlWIxznDoCoGO7oeN/view) in the Google Drive Alamat Game Assets folder.
+- **Paths:** `game/static/game/assets/creatures/kidlatin/battle/front.png`, `battle/back.png`, `menu.png`.
+- **Status:** prepared and packaged; local installation, battle/Menu/Dex verification and overworld art pending. No need to regenerate.
 
 ### #006 Pakpak
 
