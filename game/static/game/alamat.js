@@ -40,7 +40,7 @@ function asset(path,fallback){
   img.src=new URL(path+'.png',ASSET_BASE).href;
  }
  const item=images.get(path);
- return item.ready&&item.img.naturalWidth&&item.img.naturalHeight?item.img:fallback;
+ return item.ready&&item.img.width>0&&item.img.height>0?item.img:fallback;
 }
 const TILE_NAMES=['grass','forest_grass','dirt','sand','water','tall_grass','dark_grass'];
 function drawActor(ctx,pal,dir,frame,x,y){
@@ -50,7 +50,7 @@ function drawActor(ctx,pal,dir,frame,x,y){
  // Sprite sheet: four columns (frames), four rows (down/up/left/right), 64x64 cells.
  // Legacy Szadi player sheets were exported in side/back/front/mirrored-side order.
  // The game's movement direction order is down/up/left/right.
- const sourceDir=pal.id==='pl'&&img.width===256&&img.height===256?[2,1,0,3][dir]:dir;
+ const sourceDir=pal.id==='pl'?[2,1,0,3][dir]:dir;
  if(img.width===128&&img.height===192)ctx.drawImage(img,(frame%4)*32,sourceDir*48,32,48,x+16,y+15,32,48);
  else if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,sourceDir*64,64,64,x,y,64,64);
  else ctx.drawImage(img,x,y,64,64); // single-frame portraits are also supported
