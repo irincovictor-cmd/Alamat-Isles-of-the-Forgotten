@@ -291,8 +291,8 @@ place(m,S_.well,18,13,1,1,{say:['A cool, clear well. The water glimmers faintly.
  place(m,S_.sign,18,2,1,1,{nm:'Sign',say:['Balete Forest ↑ North. Wild creatures roam the tall grass.']});
  place(m,S_.sign,21,19,1,1,{nm:'Sign',say:['Lumina Village. Mind the tide.']});
  for(const x of[3,4,5,34,35,36])place(m,S_.fence,x,14,1,1);
- const ok=(x,y)=>[0,1].includes(tileAt(m,x,y))&&!(x>=15&&x<=24&&y>=11&&y<=19)&&!(y>=14&&y<=17)&&!(x>=18&&x<=21);
- for(let x=3;x<38;x+=4)if(canWalk(m,x,21)&&tileAt(m,x,21)<4&&!(x>=18&&x<=21))place(m,S_.palm,x,21,1,1,{tree:1});
+ const ok=(x,y)=>[0,1].includes(tileAt(m,x,y))&&!(x>=15&&x<=24&&y>=11&&y<=19)&&!(y>=14&&y<=17)&&!(x>=18&&x<=21)&&!(x>=24&&x<=32&&y>=16&&y<=21);
+ for(let x=3;x<38;x+=4)if(canWalk(m,x,21)&&tileAt(m,x,21)<4&&!(x>=18&&x<=21)&&!(x>=25&&x<=31))place(m,S_.palm,x,21,1,1,{tree:1});
  scatter(m,S_.tree,40,ok);scatter(m,S_.palm,14,ok);
  for(let y=1;y<22;y+=3){if(ok(0,y)&&!m.sol[y*40])place(m,S_.tree,0,y,1,1,{tree:1});if(ok(39,y)&&!m.sol[y*40+39])place(m,S_.tree,39,y,1,1,{tree:1})}
  m.npcs.push({id:'luz',name:'Ate Luz',x:21,y:14,dir:2,pal:{id:'luz',top:P.off,trim:P.teal,pants:'#3B4A6B',boots:P.dk,hair:'#3A2A20'}},
