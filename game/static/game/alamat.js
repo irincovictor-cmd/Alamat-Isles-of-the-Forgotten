@@ -167,6 +167,15 @@ bato(x){E(x,16,20,11,9,'#7A6B5A');E(x,16,22,7,6,'#9A8B7A');R(x,8,12,4,6,'#7A6B5A
 dagat(x){E(x,16,20,10,8,'#2A6A8A');E(x,16,22,6,5,'#4A9ABA');E(x,10,12,5,5,'#2A6A8A');E(x,22,12,5,5,'#2A6A8A');R(x,12,14,2,2,P.off);R(x,18,14,2,2,P.off);R(x,14,18,4,2,P.cyan);R(x,8,26,5,3,'#1A4A6A');R(x,19,26,5,3,'#1A4A6A')}
 };
 const CS={};const crSpr=id=>asset('creatures/'+id,CS[id]||(()=>{const[e,x]=mk(32,32);CR[id](x);return CS[id]=e})());
+// Optional battle-specific artwork: enemy front / allied back.
+// Missing files retain the existing 32x32 procedural creature sprite.
+function battleSprite(id,view){return asset('creatures/'+id+'/battle_'+view,crSpr(id));}
+function paintBattleCreature(ctx,id,view,x,y,size){
+ const img=battleSprite(id,view);
+ ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(img,0,0,img.width,img.height,x,y,size,size);
+}
+
 
 /* ---------- maps ---------- */
 const DIRV=[[0,1],[0,-1],[-1,0],[1,0]],tileAt=(m,x,y)=>x<0||y<0||x>=m.w||y>=m.h?4:m.g[y*m.w+x];
@@ -509,7 +518,7 @@ function drawBattle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'
  c.fillStyle='rgba(20,38,56,.35)';for(const[x,y,w]of[[470,240,110],[160,360,130]]){c.beginPath();c.ellipse(x,y,w,16,0,0,7);c.fill()}
  for(const q of[B.foe,B.me])q.dh+=(q.hp-q.dh)*.15;
  const bob=Math.sin(S.t/300)*3,sh=B.hit==='foe'&&((S.t/60|0)%2)?8:0,sm=B.hit==='me'&&((S.t/60|0)%2)?8:0;
- c.drawImage(crSpr(B.foe.id),0,0,32,32,390+sh,70+bob,160,160);c.drawImage(crSpr(B.me.id),0,0,32,32,70+sm,176-bob,192,192);
+ paintBattleCreature(c,B.foe.id,'front',390+sh,70+bob,160);paintBattleCreature(c,B.me.id,'back',70+sm,176-bob,192);
  box(24,24,270,64);tx(B.foe.n,40,52,P.navy,18);tx('Lv'+B.foe.lv,262,52,P.teal,14,'right');bar(40,62,236,B.foe.dh/B.foe.max);
  box(346,236,270,78);tx(B.me.n,362,260,P.navy,18);tx('Lv'+B.me.lv+' · '+B.me.t,598,260,P.teal,14,'right');bar(362,270,236,B.me.dh/B.me.max);
  tx('HP '+Math.ceil(B.me.dh)+'/'+B.me.max+'   Trust '+B.trust+'/5',362,296,P.navy,13);xpBar(362,304,160,B.me.xp/B.me.next);
