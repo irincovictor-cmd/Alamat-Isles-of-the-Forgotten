@@ -47,3 +47,13 @@ Expected files inside `game/static/game/assets/environment/buildings/finished/`:
 Each image is preassembled from Szadi Art's original modular Houses Pack, with its original wooden door preserved. The game keeps the existing building footprint, collision, and interaction positions. When a finished image is missing, the code-generated fallback is used.
 
 The older `environment/buildings/szadi_houses.png` and `quiet_village.png` are no longer used by the house renderer and may be archived locally once the new buildings are verified. Source: https://szadiart.itch.io/houses-pack. Follow the creator's license for game use and distribution.
+
+## Pocket Atlas Essentials — terrain (current)
+
+The terrain renderer supports the optional `game/static/game/assets/tiles/pocket_atlas.png`, a compact 256×192 atlas made from 45 original 32×32 Pocket Atlas Essentials sprites. Install `Alamat_Pocket_Atlas_Terrain.zip` from the private Google Drive folder **Alamat Game Assets** by extracting into the project root and merging the `game` folder.
+
+With the atlas installed, Lumina Village uses textured grass, dirt, sand and shallow water. Path edges and grass shoreline boundaries use matching edge/corner tiles; grass-meadow and leaf variations are deterministic by map coordinates. Balete Forest retains a darker ground tint, while tall-grass encounter zones keep their distinctive vegetation and collision/encounter rules. If the atlas is missing, the original procedural tiles render instead. The atlas is not pushed to this public repository; it is intended for local game use.
+
+Source: Ridge Works Studios, *Pocket Atlas Essentials*: https://ridgeworksstudio.itch.io/pocket-atlas-essentials. The included license permits personal/commercial project use and modification and prohibits resale/redistribution of the assets on their own or in another asset pack. The assembled atlas is therefore distributed only within the owner's private asset workflow.
+
+Note: Current auto-tiling supports direct cardinal edges and adjacent outer corners. More complex mixed-terrain junctions and shoreline animation may need a later art pass after visual testing.
