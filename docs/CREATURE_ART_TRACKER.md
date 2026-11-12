@@ -18,7 +18,7 @@
 |---|---|---|---|---|---|---|---|---|
 | 001 | Tarsilaw | Light | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 002 | Agilunos | Gale (Wind) | **Yes** | **Yes** | **Yes** | No | **Shared UI loader fixed; verify in game** | **Battle ready — in progress** |
-| 003 | Bagaon | Flame (Fire) | No | No | No | No | Placeholder | Not started |
+| 003 | Bagaon | Flame (Fire) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 004 | Alitaptap | Spark | No | No | No | No | Placeholder | Not started |
 | 005 | Lumot | Bloom (Nature) | No | No | No | No | Placeholder | Not started |
 | 006 | Pakpak | Shadow | No | No | No | No | Placeholder | Not started |
@@ -32,9 +32,19 @@
 | 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
 | 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 
-**Current counts:** 2 of 15 species have approved battle art (Tarsilaw and Agilunos); 0 of 15 are verified fully complete across all views. **13 creatures remain without approved designs.**
+**Current counts:** 3 of 15 species have approved battle art (Tarsilaw, Agilunos and Bagaon); 0 of 15 are verified fully complete across all views. **12 creatures remain without approved designs.**
 
 ## Approved art notes
+
+### #003 Bagaon
+
+- **Approved generated reference:** user-supplied transparent `bagaon.png`, 256×256 px arranged as a 4×4 pose sheet (16 cells of 64×64).
+- **Design locked:** charcoal-gray horned face/crest, deep reddish-brown stocky body, bright ember-orange glowing accents, thick curling tail tipped with fire, yellow-orange eyes.
+- **Front and menu:** first row, first column. **Battle back:** second row, fourth column (rear/side pose).
+- **Packaged assets:** [Alamat_Bagaon_Battle_Assets.zip](https://drive.google.com/file/d/104AWOe39KxHtYdaJNUOIDJ1kpAl5vsLh/view) in Google Drive's Alamat Game Assets folder.
+- **Paths:** `game/static/game/assets/creatures/bagaon/battle/front.png`, `battle/back.png`, `menu.png`.
+- **State:** cropped and packaged, awaiting user install and visual verification. No overworld animations yet.
+- **Do not regenerate** Bagaon battle art unless the user requests a redesign.
 
 ### #001 Tarsilaw
 
