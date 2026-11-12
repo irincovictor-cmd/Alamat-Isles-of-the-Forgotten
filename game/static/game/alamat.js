@@ -76,8 +76,13 @@ function drawObject(ctx,o,x,y){
    return;
   }
  }
- // Fully assembled house sprites avoid transparent atlas seams and duplicate doors.
- // Draw exactly one PNG per house; original procedural sprites remain as fallback.
+ // Fully assembled building PNGs avoid transparent atlas seams and duplicate doors.
+ // Explicit asset IDs support new buildings independently of their map coordinates.
+ if(o.buildingAsset){
+  const picture=asset('environment/buildings/finished/'+o.buildingAsset,null);
+  if(picture){ctx.drawImage(picture,x,y,o.spr.width,o.spr.height);return}
+ }
+ // Legacy buildings still resolve by map position until migrated to explicit asset IDs.
  if(o.spr.assetKey==='buildings/house'){
   const houseName={
    '6,6':'home',
@@ -274,6 +279,13 @@ function buildVillage(){const m=newMap('Lumina Village',40,30,0);
  place(m,house(5,4,P.roof,P.bamb),6,6,5,4,{say:['Your modest coastal home. Rest here to fully heal your party.'],at:[8,9],heal:1});
  place(m,house(8,6,P.teal,'#C9B48A'),26,4,8,6,{nm:'Research Center',say:['Lumina Research Center. Guardians study the Lilim here. (Interior coming later.)'],at:[30,9]});
  place(m,house(6,5,'#2F7A5A','#D9C7A0'),5,18,6,5,{nm:'Healing House',say:['Herbs and rest. Speak with Nanay Dina outside.'],at:[8,22]});
+ // Potion Shop: reuse the former market area; 192x160 art on a 6x4 footprint.
+ // Entrance at (28,20) is accessible from the south, (28,21).
+ place(m,house(6,4,P.roof,'#B98A74'),25,17,6,4,{
+  buildingAsset:'potion_shop',nm:'Herb & Potion Shop',
+  say:['Welcome to the Herb & Potion Shop! Healing remedies and supplies will be available in a future update.'],
+  at:[28,20]
+ });
 place(m,S_.well,18,13,1,1,{say:['A cool, clear well. The water glimmers faintly.']});
  place(m,S_.lantern,17,12,1,1);place(m,S_.lantern,22,12,1,1);
  place(m,S_.sign,18,2,1,1,{nm:'Sign',say:['Balete Forest ↑ North. Wild creatures roam the tall grass.']});
@@ -848,6 +860,11 @@ const TESTS=[
  ['Menu switching uses one controller',()=>typeof switchMenu==='function'&&typeof storageInput==='function'&&typeof dexInput==='function'],
  ['Attribute badges and heart indicators exist',()=>Object.keys(ATTR_STYLE).length===8&&typeof badgeType==='function'&&typeof hpHeart==='function'],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
+ ['Potion Shop has artwork key, collision and reachable entrance',()=>{
+  const shop=V.objs.find(o=>o.buildingAsset==='potion_shop');
+  return !!shop&&shop.w===6&&shop.h===4&&shop.at[0]===28&&shop.at[1]===20
+   &&V.sol[20*V.w+28]===1&&canWalk(V,28,21);
+ }],
  ['Houses and water block movement',()=>!canWalk(V,8,7)&&!canWalk(V,5,28)],
  ['Plaza path is walkable',()=>canWalk(V,19,17)],
  ['NPC found on facing tile',()=>!!npcAt(V,21,14)],
