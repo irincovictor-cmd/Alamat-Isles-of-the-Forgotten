@@ -25,16 +25,32 @@
 | 007 | Bato | Stone (Earth) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 008 | Dagat | Tide (Water) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 009 | Kidlatin | Spark | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
-| 010 | Silong | Shadow | No | No | No | No | Placeholder | Not started |
-| 011 | Arawan | Light | No | No | No | No | Placeholder | Not started |
-| 012 | Ugbok | Stone (Earth) | No | No | No | No | Placeholder | Not started |
-| 013 | Bulakna | Bloom (Nature) | No | No | No | No | Placeholder | Not started |
-| 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
-| 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
+| 010 | Silong | Shadow | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 011 | Arawan | Light | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 012 | Ugbok | Stone (Earth) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 013 | Bulakna | Bloom (Nature) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 014 | Habagat | Gale (Wind) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 015 | Liyaban | Flame (Fire) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 
-**Current counts:** 9 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon, Alitaptap, Lumot, Pakpak, Bato, Dagat and Kidlatin); 0 of 15 are verified fully complete across all views. **6 creatures remain without prepared designs.**
+**Current counts:** 15 of 15 species have approved battle art prepared; 0 of 15 are verified fully complete across all views because overworld art and local in-game visual confirmation are pending. **No more battle species need initial PixelLab generations.**
 
 ## Approved art notes
+
+### Final batch — #010 to #015
+
+Six remaining creatures were supplied as transparent 256×256, 4×4 PixelLab sheets on November 12, 2026. Individual transparent 64×64 battle sprites and a reused front-view menu portrait were extracted and packaged using the standard `game/static/game/assets/creatures/<id>/battle/{front,back}.png` and `menu.png` paths. All six can also be installed with the [combined final-six ZIP](https://drive.google.com/file/d/1aXLpF2klZZvbC3uu2v0zsEeeK-gaimCZ/view).
+
+| # | Creature | Fixed visual design | Front / Menu pose | Rear pose | ZIP |
+|---|---|---|---|---|---|
+| 010 | Silong | Deep purple stealth creature with long ears, pink-red eyes, curling tail and shadow markings | Row 1 col 1 | Row 4 col 1 | [Silong ZIP](https://drive.google.com/file/d/1E_EO1J_HxyNiQepzdohhOn3xeZgHdD59/view) |
+| 011 | Arawan | Golden sun guardian with radiant spiky mane, bright eyes and flame-like glowing tail | Row 1 col 1 | Row 2 col 3 | [Arawan ZIP](https://drive.google.com/file/d/1wXBqPIx9_m-DPHw0F2zHHqOzTEVewiun/view) |
+| 012 | Ugbok | Stocky brown rock-plated guardian with armadillo-like armor, sandstone underbelly and sturdy claws | Row 1 col 1 | Row 3 col 1 | [Ugbok ZIP](https://drive.google.com/file/d/1oxSu-iF2PJa411ggWk9u0vpCW7JJGZjy/view) |
+| 013 | Bulakna | Pale mint forest creature with oversized pink floral crown, hanging petal ears and curled vine tail | Row 1 col 1 | Row 4 col 4 | [Bulakna ZIP](https://drive.google.com/file/d/128A0hFUFLRYj3zMCHj8runbPY7og9qKS/view) |
+| 014 | Habagat | Aqua-blue serpentine wind dragon with flowing crest, mane and curled tail | Row 1 col 1 | Row 3 col 1 | [Habagat ZIP](https://drive.google.com/file/d/15Eo_ig_5ISNHJtVfS-gCrYh0KsJxjD8_/view) |
+| 015 | Liyaban | Bright orange-red fiery creature with pointed flame crest, ember markings and fire-tipped tail | Row 1 col 1 | Row 2 col 3 | [Liyaban ZIP](https://drive.google.com/file/d/1lNoA-jtejsaKEz6M689suludD8CpXwVf/view) |
+
+**Status:** all six battle portraits are cropped and ZIPs are uploaded to Google Drive. They still require installing into the local game and visually checking battle, Dex, party and any other relevant menus. Their overworld sprites are not yet produced. Do **not** generate these designs again unless the user explicitly requests a redesign.
+
 
 ### #008 Dagat
 
