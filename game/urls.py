@@ -9,4 +9,5 @@ urlpatterns = [
     path('auth/login/', views.login, name='api-login'),
     path('auth/logout/', views.logout, name='api-logout'),
     path('save/', views.save_view, name='api-save'),
+    path('dev/seed-roster/', views.seed_test_roster, name='api-seed-roster'),
 ]
