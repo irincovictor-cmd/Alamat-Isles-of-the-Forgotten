@@ -5,7 +5,7 @@ PNG files placed here automatically replace matching procedural art after refres
 ## Folder layout
 
 - `creatures/<species-id>.png`: square creature art, ideally 32×32, transparent background. IDs: `tarsilaw`, `agilunos`, `bagaon`, `alitaptap`, `lumot`, `pakpak`, `bato`, `dagat`.
-- `characters/player.png`: 256×256 sheet with 64×64 frames. Four columns = walking frames 0–3; four rows = down, up, left, right. For now, a single PNG (any dimensions) is also supported but stays static while moving.
+- `characters/player.png`: 256×256 sheet (64×64 cells) OR compact 128×192 sheet (32×48 cells). Four columns = walking frames 0–3; four rows = down, up, left, right. Single PNGs are also supported but stay static while moving.
 - `characters/luz.png`, `characters/dina.png`, `characters/tonyo.png`: NPC replacements, either the same four-direction sheet layout or a single static transparent PNG.
 - `tiles/grass.png`, `forest_grass.png`, `dirt.png`, `sand.png`, `water.png`, `tall_grass.png`, `dark_grass.png`: each 32×32, seamless edges recommended.
 - `environment/objects/lantern.png`, `well.png`, `fence.png`, `sign.png`, `stall.png`, `palm.png`, `tree.png`, `btree.png`, `shrine.png`: environment props; displayed at the dimensions of the current generated sprite. Favor transparent PNGs.
