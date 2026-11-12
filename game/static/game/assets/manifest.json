@@ -1,0 +1,11 @@
+{
+  "description": "Asset attribution record. Add one entry per downloaded asset or pack.",
+  "assets": [],
+  "entry_example": {
+    "path": "creatures/example.png",
+    "creator": "Artist name",
+    "source_url": "https://example.com",
+    "license": "CC-BY-4.0",
+    "changes": "Resized to 32x32"
+  }
+}
