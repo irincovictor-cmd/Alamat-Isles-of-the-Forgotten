@@ -50,8 +50,15 @@ function drawActor(ctx,pal,dir,frame,x,y){
  // Sprite sheet: four columns (frames), four rows (down/up/left/right), 64x64 cells.
  // Legacy Szadi player sheets were exported in side/back/front/mirrored-side order.
  // The game's movement direction order is down/up/left/right.
- const sourceDir=pal.id==='pl'?[2,1,0,3][dir]:dir;
- if(img.width===128&&img.height===192)ctx.drawImage(img,(frame%4)*32,sourceDir*48,32,48,x+16,y+15,32,48);
+ const sourceDir=pal.id==='pl'?[2,1,0,0][dir]:dir;
+ if(img.width===128&&img.height===192){
+  // Source row 0 faces left; flip that row horizontally to face right.
+  if(pal.id==='pl'&&dir===3){
+   ctx.save();ctx.translate(x+48,y+15);ctx.scale(-1,1);
+   ctx.drawImage(img,(frame%4)*32,0,32,48,0,0,32,48);
+   ctx.restore();
+  }else ctx.drawImage(img,(frame%4)*32,sourceDir*48,32,48,x+16,y+15,32,48);
+ }
  else if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,sourceDir*64,64,64,x,y,64,64);
  else ctx.drawImage(img,x,y,64,64); // single-frame portraits are also supported
 }
