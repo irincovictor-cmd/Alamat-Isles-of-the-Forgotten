@@ -27,7 +27,8 @@ def valid_save(**over):
 
 class AdminSetupCommandTests(TestCase):
     def test_setupadmin_is_registered_and_requires_terminal(self):
-        from django.core.management import get_commands, call_command, CommandError
+        from django.core.management import get_commands, call_command
+        from django.core.management.base import CommandError
         from unittest.mock import patch
         from io import StringIO
 
