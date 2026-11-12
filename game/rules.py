@@ -91,8 +91,8 @@ def _clamp(value: int, lo: int, hi: int, where: str, adjusted: list[str]) -> int
     return min(max(value, lo), hi)
 
 
-def _creature(raw: Any, index: int, adjusted: list[str]) -> dict[str, Any]:
-    where = f'party[{index}]'
+def _creature(raw: Any, index: int, adjusted: list[str], group: str = 'party') -> dict[str, Any]:
+    where = f'{group}[{index}]'
     if not isinstance(raw, dict):
         raise SaveError(f'{where} must be an object')
     sid = raw.get('id')
@@ -132,6 +132,13 @@ def sanitize_save(raw: Any) -> tuple[dict[str, Any], list[str]]:
         raise SaveError(f'party can hold at most {LIMITS["max_party"]} creatures')
     party = [_creature(c, i, adjusted) for i, c in enumerate(party_raw)]
 
+    storage_raw = raw.get('storage', [])  # older cloud saves have no reserve
+    if not isinstance(storage_raw, list):
+        raise SaveError('storage must be a list')
+    if len(storage_raw) > LIMITS['max_storage']:
+        raise SaveError(f'storage can hold at most {LIMITS["max_storage"]} creatures')
+    storage = [_creature(c, i, adjusted, 'storage') for i, c in enumerate(storage_raw)]
+
     # Permanent Dex discoveries belong to the account, not just today's party.
     # Legacy saves lack 'dex'; seed from their current party on migration.
     owned_raw = raw.get('dex', [])
@@ -141,6 +148,7 @@ def sanitize_save(raw: Any) -> tuple[dict[str, Any], list[str]]:
         raise SaveError('dex contains an unknown species')
     owned = set(owned_raw)
     owned.update(c['id'] for c in party)
+    owned.update(c['id'] for c in storage)
     dex = [sid for sid in DATA['dex_order'] if sid in owned]
 
     selyo = _clamp(_int(raw.get('selyo', 3), 'selyo'), 0, LIMITS['max_items'], 'selyo', adjusted)
@@ -195,7 +203,7 @@ def sanitize_save(raw: Any) -> tuple[dict[str, Any], list[str]]:
     d = d if 0 <= d <= 3 else 0
 
     clean = {
-        'party': party, 'dex': dex, 'selyo': selyo, 'herbs': herbs, 'f': f,
+        'party': party, 'storage': storage, 'dex': dex, 'selyo': selyo, 'herbs': herbs, 'f': f,
         'mapId': map_id, 'x': xi, 'y': yi, 'dir': d,
     }
     return clean, adjusted
