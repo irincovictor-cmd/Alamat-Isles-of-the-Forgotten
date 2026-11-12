@@ -111,7 +111,7 @@ class SanitizeSaveTests(TestCase):
         c.update(atk=99999, max=99999, hp=99999, mv=['Sky Cut', 'Nonsense'], n='Hacker', t='Fire')
         clean, adjusted = rules.sanitize_save(valid_save(party=[c]))
         out = clean['party'][0]
-        self.assertEqual((out['atk'], out['max'], out['n'], out['t']), (9, 34, 'Tarsilaw', 'Nature'))
+        self.assertEqual((out['atk'], out['max'], out['n'], out['t']), (9, 34, 'Tarsilaw', 'Light'))
         self.assertEqual(out['hp'], 34)
         self.assertEqual(out['mv'], ['Leaf Pounce', 'Tackle', 'Soothe'])
         self.assertTrue(any('hp out of range' in a for a in adjusted))
