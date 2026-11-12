@@ -63,6 +63,19 @@ function drawActor(ctx,pal,dir,frame,x,y){
  else ctx.drawImage(img,x,y,64,64); // single-frame portraits are also supported
 }
 function drawObject(ctx,o,x,y){
+ // Forest assets are 4x4 atlases of 128x128 trees (last cell intentionally blank).
+ // Keep collisions on the single trunk tile; draw the canopy above neighboring tiles.
+ // The scene's existing Y-depth sorting puts characters in front of/behind trunks.
+ if(o.tree&&(o.spr===S_.tree||o.spr===S_.btree)){
+  const sheet=asset('environment/forest/'+(o.spr===S_.btree?'bare':'green'),null);
+  if(sheet&&sheet.width>=512&&sheet.height>=512){
+   const variant=((Math.imul(o.x+1,73856093)^Math.imul(o.y+1,19349663))>>>0)%15;
+   const size=112,srcX=(variant%4)*128,srcY=Math.floor(variant/4)*128;
+   ctx.drawImage(sheet,srcX,srcY,128,128,
+    Math.round(x+o.spr.width/2-size/2),Math.round(y+o.spr.height-size),size,size);
+   return;
+  }
+ }
  const key=o.spr.assetKey;
  const img=key?asset('environment/'+key,o.spr):o.spr;
  ctx.drawImage(img,x,y,o.spr.width,o.spr.height);
@@ -183,9 +196,9 @@ function buildForest(){const m=newMap('Balete Forest',30,24,6);
  m.enc=['alitaptap','lumot','pakpak','bato'];m.dark=1;
  place(m,S_.sign,13,3,1,1,{nm:'Sign',say:['The Ancient Shrine lies beyond the northern path.']});
  const ok=(x,y)=>[1,6].includes(tileAt(m,x,y))&&y<21&&!(x>=13&&x<=16);
- for(let x=0;x<30;x+=2){if(ok(x,0)&&x!==14&&x!==15)place(m,S_.btree,x,0,1,1,{tree:1})}
- for(let y=1;y<22;y+=2){if(ok(0,y))place(m,S_.btree,0,y,1,1,{tree:1});if(ok(29,y))place(m,S_.btree,29,y,1,1,{tree:1})}
- scatter(m,S_.btree,55,ok);
+ for(let x=0;x<30;x+=2){if(ok(x,0)&&x!==14&&x!==15)place(m,S_.tree,x,0,1,1,{tree:1})}
+ for(let y=1;y<22;y+=2){if(ok(0,y))place(m,S_.tree,0,y,1,1,{tree:1});if(ok(29,y))place(m,S_.tree,29,y,1,1,{tree:1})}
+ scatter(m,S_.tree,55,ok);
  m.exits.forEach(e=>{m.sol[e.y*m.w+e.x]=0});
  bake(m);return m}
 function buildShrine(){const m=newMap('Ancient Shrine',16,12,6);
