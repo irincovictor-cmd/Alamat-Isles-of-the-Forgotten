@@ -9,6 +9,39 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let waiter=null;const nextKey=()=>new Promise(r=>{waiter=r});
 const pause=ms=>new Promise(r=>{const t=setTimeout(()=>{waiter=null;r()},ms);waiter=()=>{clearTimeout(t);r()}});
 
+/* ---------- optional image assets ----------
+   Drop PNGs into game/static/game/assets; failed/missing images keep procedural art.
+   The browser loads assets relative to this script, including Django's STATIC_URL. */
+const ASSET_BASE=new URL('assets/',document.currentScript?.src||location.href);
+const images=new Map();
+function asset(path,fallback){
+ if(!images.has(path)){
+  const img=new Image();images.set(path,{img,ready:false});
+  img.onload=()=>{images.get(path).ready=true;
+   // Map backgrounds were baked before the image arrived; regenerate their tiles.
+   if(path.startsWith('tiles/')&&typeof MAPS!=='undefined')Object.values(MAPS).forEach(bake);
+  };
+  img.onerror=()=>{images.get(path).missing=true};
+  img.src=new URL(path+'.png',ASSET_BASE).href;
+ }
+ const item=images.get(path);
+ return item.ready&&item.img.naturalWidth&&item.img.naturalHeight?item.img:fallback;
+}
+const TILE_NAMES=['grass','forest_grass','dirt','sand','water','tall_grass','dark_grass'];
+function drawActor(ctx,pal,dir,frame,x,y){
+ const key=pal.id==='pl'?'characters/player':'characters/'+pal.id;
+ const fallback=charSprite(pal,dir,frame),img=asset(key,fallback);
+ if(img===fallback){ctx.drawImage(fallback,x,y);return}
+ // Sprite sheet: four columns (frames), four rows (down/up/left/right), 64x64 cells.
+ if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,dir*64,64,64,x,y,64,64);
+ else ctx.drawImage(img,x,y,64,64); // single-frame portraits are also supported
+}
+function drawObject(ctx,o,x,y){
+ const key=o.spr.assetKey;
+ const img=key?asset('environment/'+key,o.spr):o.spr;
+ ctx.drawImage(img,x,y,o.spr.width,o.spr.height);
+}
+
 /* ---------- tiles ---------- */
 const TC=[['#83B66A','#97C67C','#74A85F'],['#5E9A5C','#4D8A4F','#6BA866'],['#C9A56B','#B8935A','#D9B97F'],['#D7B779','#E3C98F','#C8A767'],['#317F91','#4A9BAE','#296B7C'],['#4E9A55','#2F7A3F','#6DB060'],['#3B6B4A','#2E5A3E','#4B7B52']];
 const TL=TC.map((q,id)=>{const[e,x]=mk(T,T);R(x,0,0,T,T,q[0]);for(let i=0;i<26;i++)R(x,rnd()*T,rnd()*T,2,2,q[1+(i&1)]);
@@ -40,7 +73,7 @@ function house(w,h,roof,wall){const WW=w*T,HH=(h+1)*T,[e,x]=mk(WW,HH),dt=w>>1,rh
  for(let r=0;r<rh;r++){const ins=Math.round((1-r/rh)*WW*.3);R(x,ins,4+r,WW-2*ins,1,roof);if(r%6<2)R(x,ins,4+r,WW-2*ins,1,'rgba(255,255,255,.14)')}
  R(x,2,rh+4,WW-4,4,roof);R(x,2,rh+8,WW-4,2,'rgba(0,0,0,.3)');
  R(x,dt*T+3,HH-44,26,32,P.dk);R(x,dt*T+23,HH-30,3,3,P.gold);R(x,dt*T,HH-12,T,4,P.sand);
- if(w>=5){for(const wx of[16,WW-34]){R(x,wx,wy+14,18,16,'#2A4A52');R(x,wx+2,wy+16,14,12,P.cyan)}}return e}
+ if(w>=5){for(const wx of[16,WW-34]){R(x,wx,wy+14,18,16,'#2A4A52');R(x,wx+2,wy+16,14,12,P.cyan)}}e.assetKey='buildings/house';return e}
 function palm(){const[e,x]=mk(64,96);E(x,32,92,12,3,'rgba(20,38,56,.3)');
  for(let y=94;y>34;y--){const o=Math.round(Math.sin((94-y)/20)*4);R(x,30+o,y,6,1,y%7===0?P.dk:P.wood)}
  const cx=34,cy=34;[-170,-130,-95,-60,-20,15].forEach((a,i)=>{const r=a*Math.PI/180;for(let t=0;t<26;t++)E(x,cx+Math.cos(r)*t,cy+Math.sin(r)*t*.6+t*t/45,2,2,i%2?P.forest:'#2F7A4A')});
@@ -55,6 +88,9 @@ S_.sign=(()=>{const[e,x]=mk(32,48);R(x,14,20,4,26,P.dk);R(x,4,8,24,16,P.bamb);R(
 S_.stall=(()=>{const[e,x]=mk(128,96);R(x,0,52,128,40,P.bamb);R(x,0,52,128,4,P.wood);for(let i=0;i<8;i++)R(x,i*16,8,16,30,i%2?P.off:P.teal);R(x,0,38,128,4,'rgba(0,0,0,.25)');[[20,P.gold],[44,P.roof],[70,P.fern],[96,P.cyan]].forEach(([a,f])=>E(x,a,50,7,5,f));return e})();
 S_.palm=palm();S_.tree=tree(0);S_.btree=tree(1);
 S_.shrine=(()=>{const[e,x]=mk(96,96);E(x,48,90,28,4,'rgba(20,38,56,.35)');R(x,20,50,56,40,P.wood);R(x,24,54,48,32,'#C9B48A');R(x,42,70,12,20,P.dk);R(x,10,40,76,14,P.roof);R(x,18,30,60,12,P.roof);R(x,28,20,40,12,P.roof);R(x,38,10,20,12,P.gold);E(x,48,16,6,6,P.cyan);return e})();
+
+// Fixed filenames for environmental objects; generated art remains the fallback.
+for(const key of Object.keys(S_))S_[key].assetKey='objects/'+key;
 
 /* ---------- creatures ---------- */
 /* Species / moves / type chart are served by Django (game/data/game_data.json) */
@@ -73,7 +109,7 @@ pakpak(x){E(x,7,16,7,4,P.violet);E(x,25,16,7,4,P.violet);E(x,16,18,5,7,'#5A4A5E'
 bato(x){E(x,16,20,11,9,'#7A6B5A');E(x,16,22,7,6,'#9A8B7A');R(x,8,12,4,6,'#7A6B5A');R(x,20,12,4,6,'#7A6B5A');R(x,11,16,2,2,P.navy);R(x,19,16,2,2,P.navy);R(x,14,24,4,2,P.dk);R(x,6,28,6,2,'#5A4A3A');R(x,20,28,6,2,'#5A4A3A')},
 dagat(x){E(x,16,20,10,8,'#2A6A8A');E(x,16,22,6,5,'#4A9ABA');E(x,10,12,5,5,'#2A6A8A');E(x,22,12,5,5,'#2A6A8A');R(x,12,14,2,2,P.off);R(x,18,14,2,2,P.off);R(x,14,18,4,2,P.cyan);R(x,8,26,5,3,'#1A4A6A');R(x,19,26,5,3,'#1A4A6A')}
 };
-const CS={};const crSpr=id=>CS[id]||(()=>{const[e,x]=mk(32,32);CR[id](x);return CS[id]=e})();
+const CS={};const crSpr=id=>asset('creatures/'+id,CS[id]||(()=>{const[e,x]=mk(32,32);CR[id](x);return CS[id]=e})());
 
 /* ---------- maps ---------- */
 const DIRV=[[0,1],[0,-1],[-1,0],[1,0]],tileAt=(m,x,y)=>x<0||y<0||x>=m.w||y>=m.h?4:m.g[y*m.w+x];
@@ -81,7 +117,7 @@ const newMap=(name,w,h,b)=>({name,w,h,g:new Uint8Array(w*h).fill(b),sol:new Uint
 const fill=(m,id,x,y,w,h)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)if(i>=0&&j>=0&&i<m.w&&j<m.h)m.g[j*m.w+i]=id};
 function place(m,spr,x,y,w,h,ex){const o=Object.assign({x,y,w,h,spr,px:x*T+w*T/2-spr.width/2,py:(y+h)*T-spr.height,sy:(y+h)*T},ex||{});
  for(let j=0;j<h;j++)for(let i=0;i<w;i++)m.sol[(y+j)*m.w+x+i]=1;m.objs.push(o);return o}
-function bake(m){const[e,x]=mk(m.w*T,m.h*T);for(let j=0;j<m.h;j++)for(let i=0;i<m.w;i++){const id=m.g[j*m.w+i];x.drawImage(TL[id],i*T,j*T);
+function bake(m){const[e,x]=mk(m.w*T,m.h*T);for(let j=0;j<m.h;j++)for(let i=0;i<m.w;i++){const id=m.g[j*m.w+i];x.drawImage(asset('tiles/'+TILE_NAMES[id],TL[id]),i*T,j*T,T,T);
  if(id===0&&rnd()<.06)R(x,i*T+rnd()*28,j*T+rnd()*28,3,3,[P.gold,P.off,'#E58BA5',P.violet][rnd()*4|0]);
  if(id===4&&tileAt(m,i,j-1)===3)R(x,i*T,j*T,T,3,'rgba(245,240,231,.7)')}m.gl=e}
 const npcAt=(m,x,y)=>m.npcs.find(n=>n.x===x&&n.y===y);
@@ -343,10 +379,10 @@ function update(dt){S.t+=dt;if(DG)DG.i=Math.min(DG.t.length,DG.i+dt/25);if(S.msg
 /* ---------- draw ---------- */
 function drawWorld(){const m=S.map,p=S.p,cx=Math.max(0,Math.min(m.w*T-W,Math.round(p.px+16-W/2))),cy=Math.max(0,Math.min(m.h*T-H,Math.round(p.py+16-H/2)));
  c.drawImage(m.gl,cx,cy,W,H,0,0,W,H);
- if((S.t/600|0)%2)for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(tileAt(m,i,j)===4&&i<m.w&&j<m.h)c.drawImage(WA,i*T-cx,j*T-cy);
- const L=m.objs.map(o=>({sy:o.sy,fn:()=>c.drawImage(o.spr,o.px-cx,o.py-cy)}));
- m.npcs.forEach(n=>L.push({sy:n.y*T+T,fn:()=>c.drawImage(charSprite(n.pal,n.dir,0),n.x*T+16-32-cx,n.y*T+T-63-cy)}));
- L.push({sy:p.py+T,fn:()=>c.drawImage(charSprite(PL,p.dir,p.f),Math.round(p.px+16-32-cx),Math.round(p.py+T-63-cy))});
+ if((S.t/600|0)%2)for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(tileAt(m,i,j)===4&&i<m.w&&j<m.h)c.drawImage(asset('tiles/water',WA),i*T-cx,j*T-cy,T,T);
+ const L=m.objs.map(o=>({sy:o.sy,fn:()=>drawObject(c,o,o.px-cx,o.py-cy)}));
+ m.npcs.forEach(n=>L.push({sy:n.y*T+T,fn:()=>drawActor(c,n.pal,n.dir,0,n.x*T+16-32-cx,n.y*T+T-63-cy)}));
+ L.push({sy:p.py+T,fn:()=>drawActor(c,PL,p.dir,p.f,Math.round(p.px+16-32-cx),Math.round(p.py+T-63-cy))});
  L.sort((a,b)=>a.sy-b.sy).forEach(q=>q.fn());
  if(m.dark){c.fillStyle='rgba(8,20,32,.28)';c.fillRect(0,0,W,H);for(const f of FF){const x=f.x+Math.sin(S.t/700+f.o)*20-cx,y=f.y+Math.cos(S.t/900+f.o)*14-cy;if(x>-8&&x<W+8&&y>-8&&y<H+8){c.fillStyle='rgba(118,216,210,.25)';c.fillRect(x-3,y-3,7,7);c.fillStyle=P.cyan;c.fillRect(x-1,y-1,3,3)}}}
  if(S.insp){c.fillStyle='rgba(220,50,50,.35)';for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(i<m.w&&j<m.h&&(m.sol[j*m.w+i]||tileAt(m,i,j)===4))c.fillRect(i*T-cx,j*T-cy,T,T);
