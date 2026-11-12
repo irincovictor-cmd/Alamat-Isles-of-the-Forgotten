@@ -473,6 +473,8 @@
   },
   "encounters": {
     "F": [
+      "tarsilaw",
+      "agilunos",
       "alitaptap",
       "lumot",
       "pakpak",
@@ -483,14 +485,15 @@
       "habagat"
     ],
     "S": [
-      "alitaptap",
+      "bagaon",
       "dagat",
       "bato",
       "pakpak",
       "arawan",
       "ugbok",
       "liyaban",
-      "kidlatin"
+      "kidlatin",
+      "alitaptap"
     ]
   }
 }
