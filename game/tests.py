@@ -43,6 +43,24 @@ class RulesTests(TestCase):
             for lv in (1, 5, 7, 30):
                 self.assertTrue(all(m in rules.MOVES for m in rules.moves_for(sid, lv)))
 
+    def test_creature_roster_and_matchup_coverage(self):
+        self.assertEqual(len(rules.SPECIES), 15)
+        self.assertEqual(len(rules.DATA['dex_order']), 15)
+        self.assertEqual(set(rules.DATA['dex_order']), set(rules.SPECIES))
+        available = set(rules.DATA['encounters']['F'] + rules.DATA['encounters']['S'])
+        self.assertEqual(available, set(rules.SPECIES))
+        self.assertEqual(len(rules.DATA['attribute_names']), 8)
+        for species in rules.SPECIES.values():
+            self.assertIn(species['t'], rules.DATA['type_chart'])
+            self.assertTrue(species.get('lore'))
+
+    def test_attribute_counters(self):
+        chart = rules.DATA['type_chart']
+        self.assertGreater(chart['Water']['Fire'], 1)
+        self.assertGreater(chart['Spark']['Water'], 1)
+        self.assertGreater(chart['Light']['Shadow'], 1)
+        self.assertGreater(chart['Fire']['Nature'], 1)
+
     def test_stat_formula_matches_client_known_values(self):
         # same numbers asserted by the browser self-test ("Stats formula matches server rules.py")
         self.assertEqual(rules.stats_for('tarsilaw', 10),
@@ -66,6 +84,24 @@ class SanitizeSaveTests(TestCase):
         self.assertEqual(adjusted, [])
         self.assertEqual(clean['party'][0], rules.make_creature('tarsilaw', 5))
         self.assertEqual((clean['mapId'], clean['x'], clean['y']), ('V', 19, 17))
+
+    def test_dex_unlocks_are_saved_and_legacy_party_migrates(self):
+        old, _ = rules.sanitize_save(valid_save())
+        self.assertEqual(old['dex'], ['tarsilaw'])
+        raw = valid_save(dex=['kidlatin', 'agilunos', 'kidlatin'])
+        current, _ = rules.sanitize_save(raw)
+        self.assertEqual(current['dex'], ['tarsilaw', 'agilunos', 'kidlatin'])
+        self.assertEqual(rules.sanitize_save(current)[0]['dex'], current['dex'])
+
+    def test_invalid_dex_entries_are_rejected(self):
+        for dex in ('tarsilaw', ['unknown'], [123], [{}], ['tarsilaw'] * 16):
+            with self.assertRaises(rules.SaveError):
+                rules.sanitize_save(valid_save(dex=dex))
+
+    def test_dex_stays_unlocked_after_party_swap(self):
+        clean, _ = rules.sanitize_save(valid_save(party=[rules.make_creature('bato', 5)],
+                                                  dex=['tarsilaw', 'kidlatin']))
+        self.assertEqual(clean['dex'], ['tarsilaw', 'bato', 'kidlatin'])
 
     def test_empty_save_is_allowed(self):
         self.assertEqual(rules.sanitize_save({}), ({}, []))
