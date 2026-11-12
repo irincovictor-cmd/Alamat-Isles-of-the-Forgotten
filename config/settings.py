@@ -91,10 +91,13 @@ DATABASES = {
 
 # ---- accounts -------------------------------------------------------------
 AUTHENTICATION_BACKENDS = ['game.accounts.CaseInsensitiveBackend']
-# Deliberately light: this is a game account, not a bank. Only a minimum length.
+# Consistent password policy for browser and API registration.
 AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-     'OPTIONS': {'min_length': 6}},
+     'OPTIONS': {'min_length': 8}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 import sys
 if 'test' in sys.argv:  # fast hashing for the test suite only
