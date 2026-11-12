@@ -152,6 +152,11 @@ for(const key of Object.keys(S_))S_[key].assetKey='objects/'+key;
 /* ---------- creatures ---------- */
 /* Species / moves / type chart are served by Django (game/data/game_data.json) */
 const DATA=JSON.parse(document.getElementById('alamat-data').textContent),SP=DATA.species,MV=DATA.moves,TYPE_EFF=DATA.type_chart,LIM=DATA.limits;
+const DEX_ORDER=DATA.dex_order||Object.keys(SP),ATTRIBUTE_NAMES=DATA.attribute_names||{};
+const typeName=t=>ATTRIBUTE_NAMES[t]||t;
+const winsAgainst=t=>Object.keys(TYPE_EFF[t]||{}).filter(x=>TYPE_EFF[t][x]>1);
+const weakTo=t=>Object.keys(TYPE_EFF).filter(x=>TYPE_EFF[x]?.[t]>1);
+
 const statsFor=(id,lv)=>{const s=SP[id],k=1+(lv-5)*0.08;return{max:Math.round(s.hp*k),atk:Math.round(s.atk*k),def:Math.round(s.def*k),spd:Math.round(s.spd*k)}};
 const movesFor=(id,lv)=>{const s=SP[id];return[s.a,s.up&&lv>=s.up_lv?s.up:'Tackle','Soothe']};
 const mkC=(id,lv=5)=>{const s=SP[id],st=statsFor(id,lv);
@@ -166,7 +171,15 @@ pakpak(x){E(x,7,16,7,4,P.violet);E(x,25,16,7,4,P.violet);E(x,16,18,5,7,'#5A4A5E'
 bato(x){E(x,16,20,11,9,'#7A6B5A');E(x,16,22,7,6,'#9A8B7A');R(x,8,12,4,6,'#7A6B5A');R(x,20,12,4,6,'#7A6B5A');R(x,11,16,2,2,P.navy);R(x,19,16,2,2,P.navy);R(x,14,24,4,2,P.dk);R(x,6,28,6,2,'#5A4A3A');R(x,20,28,6,2,'#5A4A3A')},
 dagat(x){E(x,16,20,10,8,'#2A6A8A');E(x,16,22,6,5,'#4A9ABA');E(x,10,12,5,5,'#2A6A8A');E(x,22,12,5,5,'#2A6A8A');R(x,12,14,2,2,P.off);R(x,18,14,2,2,P.off);R(x,14,18,4,2,P.cyan);R(x,8,26,5,3,'#1A4A6A');R(x,19,26,5,3,'#1A4A6A')}
 };
-const CS={};const crSpr=id=>asset('creatures/'+id,CS[id]||(()=>{const[e,x]=mk(32,32);CR[id](x);return CS[id]=e})());
+function genericCreature(x,id){
+ const t=SP[id]?.t||'Nature',a={Spark:'#e5ce56',Shadow:'#544570',Light:'#e8d09b',Earth:'#9b7757',Wind:'#92c9bb',Nature:'#6b9d53',Water:'#5e9cca',Fire:'#db734e'}[t]||'#8f9a78';
+ E(x,16,20,11,9,a);E(x,16,11,8,7,a);E(x,9,5,4,5,a);E(x,23,5,4,5,a);
+ R(x,11,11,3,3,P.navy);R(x,19,11,3,3,P.navy);
+ E(x,12,27,4,3,P.dk);E(x,22,27,4,3,P.dk);
+ const h=Array.from(id).reduce((n,c)=>n+c.charCodeAt(0),0);
+ if(h%2)R(x,25,18,6,3,a);if(h%3)E(x,16,20,5,4,P.off);
+}
+const CS={};const crSpr=id=>asset('creatures/'+id,CS[id]||(()=>{const[e,x]=mk(32,32);(CR[id]||((ctx)=>genericCreature(ctx,id)))(x);return CS[id]=e})());
 // Optional battle-specific artwork: enemy front / allied back.
 // Missing files retain the existing 32x32 procedural creature sprite.
 function battleSprite(id,view){return asset('creatures/'+id+'/battle_'+view,crSpr(id));}
@@ -272,7 +285,7 @@ function buildForest(){const m=newMap('Balete Forest',30,24,6);
  fill(m,5,12,8,6,5);
  m.exits.push({x:14,y:23,to:'V',tx:19,ty:1,dir:0},{x:15,y:23,to:'V',tx:20,ty:1,dir:0},
   {x:14,y:0,to:'S',tx:7,ty:10,dir:1},{x:15,y:0,to:'S',tx:8,ty:10,dir:1});
- m.enc=['alitaptap','lumot','pakpak','bato'];m.dark=1;
+ m.enc=DATA.encounters?.F||['alitaptap','lumot','pakpak','bato'];m.dark=1;
  place(m,S_.sign,13,3,1,1,{nm:'Sign',say:['The Ancient Shrine lies beyond the northern path.']});
  const ok=(x,y)=>[1,6].includes(tileAt(m,x,y))&&y<21&&!(x>=13&&x<=16);
  for(let x=0;x<30;x+=2){if(ok(x,0)&&x!==14&&x!==15)place(m,S_.tree,x,0,1,1,{tree:1})}
@@ -283,7 +296,7 @@ function buildForest(){const m=newMap('Balete Forest',30,24,6);
 function buildShrine(){const m=newMap('Ancient Shrine',16,12,6);
  fill(m,2,6,0,4,12);fill(m,5,2,4,4,4);fill(m,5,10,4,4,4);
  m.exits.push({x:7,y:11,to:'F',tx:14,ty:1,dir:0},{x:8,y:11,to:'F',tx:15,ty:1,dir:0});
- m.enc=['alitaptap','dagat','bato','pakpak'];m.dark=1;
+ m.enc=DATA.encounters?.S||['alitaptap','dagat','bato','pakpak'];m.dark=1;
  place(m,S_.shrine,5,2,3,3,{nm:'Ancient Shrine',say:['Weathered stone. Faint light pulses from the altar. The Lilim’s influence is strong here… (Full shrine quest later.)'],at:[7,4]});
  place(m,S_.btree,1,1,1,1,{tree:1});place(m,S_.btree,14,1,1,1,{tree:1});
  place(m,S_.btree,1,8,1,1,{tree:1});place(m,S_.btree,14,8,1,1,{tree:1});
@@ -295,8 +308,8 @@ sd=(Date.now()^Math.floor(Math.random()*4294967296))|0; /* world generation stay
 
 /* ---------- state ---------- */
 const S={mode:'title',map:V,mapId:'V',p:{x:19,y:17,px:19*T,py:17*T,tx:0,ty:0,dir:0,mv:0,f:0,ft:0},
- party:[],selyo:3,herbs:2,f:{},busy:false,fade:0,t:0,insp:false,msg:null};
-let DG=null,U=null,B=null,PARTY=null;const held={up:0,down:0,left:0,right:0};
+ party:[],dex:[],selyo:3,herbs:2,f:{},busy:false,fade:0,t:0,insp:false,msg:null};
+let DG=null,U=null,B=null,PARTY=null,DEX=null;const held={up:0,down:0,left:0,right:0};
 const TALK={};
 const tx=(s,x,y,col,sz,al)=>{c.font='bold '+(sz||18)+'px "Trebuchet MS",system-ui,sans-serif';c.fillStyle=col||P.navy;c.textAlign=al||'left';c.textBaseline='alphabetic';c.fillText(s,x,y)};
 const box=(x,y,w,h)=>{c.fillStyle='rgba(245,240,231,.97)';c.fillRect(x,y,w,h);c.strokeStyle=P.navy;c.lineWidth=3;c.strokeRect(x+1.5,y+1.5,w-3,h-3);c.strokeStyle=P.teal;c.lineWidth=2;c.strokeRect(x+6,y+6,w-12,h-12)};
@@ -319,10 +332,10 @@ async function api(method,body){
  if(r.status===409){const e=new Error('conflict');e.conflict=true;e.body=j;throw e}
  if(!r.ok){const e=new Error((j&&j.detail)||('HTTP '+r.status));e.body=j;throw e}
  return j}
-const snapshot=()=>JSON.parse(JSON.stringify({party:S.party,selyo:S.selyo,herbs:S.herbs,f:S.f,mapId:S.mapId,x:S.p.x,y:S.p.y,dir:S.p.dir}));
+const snapshot=()=>JSON.parse(JSON.stringify({party:S.party,dex:S.dex,selyo:S.selyo,herbs:S.herbs,f:S.f,mapId:S.mapId,x:S.p.x,y:S.p.y,dir:S.p.dir}));
 const hasLocal=()=>{try{return !!localStorage.getItem(LOCAL_KEY)}catch(e){return false}};
 const canContinue=()=>cloud.has||(cloud.state==='offline'&&hasLocal());
-function applySave(d){S.party=d.party||[];S.selyo=d.selyo??3;S.herbs=d.herbs??2;S.f=d.f||{};
+function applySave(d){S.party=d.party||[];S.dex=DEX_ORDER.filter(id=>(d.dex||[]).includes(id)||S.party.some(c=>c.id===id));DEX=null;S.selyo=d.selyo??3;S.herbs=d.herbs??2;S.f=d.f||{};
  const mid=MAPS[d.mapId]?d.mapId:'V';S.mapId=mid;S.map=MAPS[mid];S.p.x=d.x??19;S.p.y=d.y??17;S.p.dir=d.dir??0;
  S.p.px=S.p.x*T;S.p.py=S.p.y*T;S.p.mv=0;S.mode='world';S.fade=0;fadeTarget=null;S.loading=null;S.safe=4}
 function startNew(){applySave({});S.msg=null}
@@ -358,7 +371,7 @@ async function pickStarter(){U={ids:['tarsilaw','agilunos','bagaon'],sel:0};cons
 const objective=()=>!S.f.starter?'Speak with Ate Luz on the plaza':!S.f.bonded?'Go north into Balete Forest and bond with a wild creature':!S.f.shrine?'Visit the Ancient Shrine north of the forest':!S.f.done?'Return to Ate Luz':'Chapter complete. Explore freely!';
 TALK.luz=async()=>{const f=S.f;
  if(!f.starter){await talk('Ate Luz',['Welcome to Lumina Village, traveler! I’m Luz, a guardian-researcher on Isla Maharlika.','Strange disturbances — the Lilim — are spreading through Balete Forest. You shouldn’t go alone.','Choose a partner creature to travel with.']);
-  const id=await pickStarter();S.party.push(mkC(id,5));f.starter=true;
+  const id=await pickStarter();S.party.push(mkC(id,5));S.dex=DEX_ORDER.filter(x=>x===id||S.dex.includes(x));f.starter=true;
   await talk('Ate Luz',[SP[id].n+' it is! Look after each other.','Head north to Balete Forest. Wild creatures hide in the tall grass.','Lower their HP, use Soothe to build Trust, then offer a Selyo to bond.','Press P anytime to check your party. F5 saves your progress.'])}
  else if(f.bonded&&f.shrine&&!f.done){f.done=true;await talk('Ate Luz',['You formed a bond and reached the shrine! That’s how we’ll restore habitats the Lilim has disturbed.','Chapter complete. Thank you for testing the prototype! Explore freely or start a new journey.'])}
  else if(f.bonded&&!f.shrine)await talk('Ate Luz',['Good work bonding. The Ancient Shrine is north of the forest — see what you can learn there.']);
@@ -408,9 +421,9 @@ async function battle(fid){S.busy=true;await fade(1);S.mode='battle';
    const hpFactor=(1-foe.hp/foe.max)*0.55;const trustFactor=B.trust*0.09;const ch=Math.min(.92,Math.max(.06,.18+hpFactor+trustFactor));
    if(rnd()<ch){await say('Bond formed! '+foe.n+' trusts you now.');S.f.bonded=true;
     const recruit=mkC(fid,foe.lv);recruit.hp=Math.max(1,Math.floor(foe.hp));recruit.dh=recruit.hp;
-    if(S.party.length<LIM.max_party){S.party.push(recruit);await say(foe.n+' joined your party!')}
+    if(S.party.length<LIM.max_party){S.party.push(recruit);S.dex=DEX_ORDER.filter(x=>x===fid||S.dex.includes(x));await say(foe.n+' joined your party!')}
     else{B.msg='Your party is full! Who makes room for '+foe.n+'?';const k=await menu(S.party.map(q=>'Swap '+q.n).concat(['Let it go']));
-     if(k>=0&&k<S.party.length){const out=S.party[k];S.party[k]=recruit;await say(out.n+' returns to the wild. '+foe.n+' joined your party!')}else await say(foe.n+' returns to the wild.')}
+     if(k>=0&&k<S.party.length){const out=S.party[k];S.party[k]=recruit;S.dex=DEX_ORDER.filter(x=>x===fid||S.dex.includes(x));await say(out.n+' returns to the wild. '+foe.n+' joined your party!')}else await say(foe.n+' returns to the wild.')}
     res='bond';break}
    await say('The bond slipped away…');if(!await foeAtk())res='lose'}
   else if(a===2){/* items */const opts=[];if(S.herbs>0)opts.push('Herb (heal)');opts.push('Cancel');
@@ -490,7 +503,7 @@ async function interact(){const m=S.map,p=S.p,x=p.x+DIRV[p.dir][0],y=p.y+DIRV[p.
  if(o){S.busy=true;if(o.heal){S.party.forEach(q=>{q.hp=q.max;q.dh=q.max});await talk('',['You rest at home. Your party is fully healed.']);}
   else await talk(o.nm||'',o.say);S.busy=false}}
 function update(dt){S.t+=dt;if(DG)DG.i=Math.min(DG.t.length,DG.i+dt/25);if(S.msg){S.msg.ttl-=dt/16;if(S.msg.ttl<=0)S.msg=null}
- if(S.mode!=='world'||PARTY)return;const p=S.p;
+ if(S.mode!=='world'||PARTY||DEX)return;const p=S.p;
  if(p.mv){p.mv+=dt/170;if(p.mv>=1){p.mv=0;p.x=p.tx;p.y=p.ty;p.px=p.x*T;p.py=p.y*T;arrive()}else{p.px=(p.x+(p.tx-p.x)*p.mv)*T;p.py=(p.y+(p.ty-p.y)*p.mv)*T;p.ft+=dt;p.f=((p.ft/110)|0)%4}return}
  p.f=0;if(S.busy)return;for(const d of['up','down','left','right'])if(held[d]){tryMove(d);break}}
 
@@ -541,6 +554,62 @@ function drawParty(){if(!PARTY)return;c.fillStyle='rgba(20,38,56,.88)';c.fillRec
   tx('ATK '+cr.atk+'  DEF '+cr.def+'  SPD '+cr.spd,W/2,308,P.navy,15,'center');
   tx('Moves: '+cr.mv.join(', '),W/2,340,P.navy,14,'center');tx('Enter / Esc to close',W/2,370,P.roof,13,'center')}
  tx('Selyo ×'+S.selyo+'   Herbs ×'+S.herbs+'   ·  Esc to close',W/2,450,P.off,14,'center')}
+/* ---------- Creature Dex and matchup guide ---------- */
+function openDex(tab='dex'){
+ if(S.mode!=='world'||S.busy||S.p.mv)return;
+ DEX={tab,sel:0};
+}
+function dexInput(a){
+ if(a==='back'||a==='dex'||a==='guide'){DEX=null;return}
+ if(a==='party'){DEX.tab=DEX.tab==='dex'?'guide':'dex';return}
+ if(a==='ok'){DEX.tab=DEX.tab==='dex'?'guide':'dex';return}
+ if(DEX.tab==='dex'){
+  const cols=5,len=DEX_ORDER.length;
+  if(a==='left')DEX.sel=(DEX.sel+len-1)%len;
+  if(a==='right')DEX.sel=(DEX.sel+1)%len;
+  if(a==='up')DEX.sel=(DEX.sel+len-cols)%len;
+  if(a==='down')DEX.sel=(DEX.sel+cols)%len;
+ }
+}
+function drawDex(){
+ if(!DEX)return;
+ c.fillStyle='rgba(11,23,32,.95)';c.fillRect(0,0,W,H);
+ if(DEX.tab==='guide'){
+  tx('ATTRIBUTE COUNTER GUIDE',W/2,38,P.gold,23,'center');
+  tx('Use a strong attacking attribute against the enemy.',W/2,65,P.off,13,'center');
+  const names=['Fire','Water','Earth','Nature','Wind','Spark','Light','Shadow'];
+  names.forEach((t,i)=>{
+   const y=92+i*37;
+   if(i%2===0){c.fillStyle='rgba(245,240,231,.09)';c.fillRect(22,y-18,596,35)}
+   tx(typeName(t),35,y+3,P.gold,16);
+   tx('Counter: '+weakTo(t).map(typeName).join(' / '),205,y+3,P.off,14);
+  });
+  tx('Strength is based on the move attribute, not only the creature.',W/2,417,P.cyan,13,'center');
+  tx('Enter: Dex  ·  Esc: Close',W/2,453,P.off,13,'center');return;
+ }
+ const n=S.dex.length;
+ tx('CREATURE DEX',W/2,35,P.gold,26,'center');
+ tx('Registered '+n+' / '+DEX_ORDER.length,W/2,60,P.off,15,'center');
+ DEX_ORDER.forEach((id,i)=>{
+  const col=i%5,row=Math.floor(i/5),x=20+col*122,y=77+row*91,known=S.dex.includes(id);
+  c.fillStyle=i===DEX.sel?'#f1c66a':'#d7e2d4';c.fillRect(x,y,112,83);
+  c.fillStyle='#263d42';c.fillRect(x+4,y+4,104,75);
+  const img=crSpr(id);
+  c.save();if(!known)c.filter='brightness(0)';
+  c.drawImage(img,0,0,img.width,img.height,x+32,y+3,48,48);c.restore();
+  tx('#'+String(i+1).padStart(3,'0'),x+7,y+15,P.gold,10);
+  tx(known?SP[id].n:'???',x+56,y+67,P.off,12,'center');
+ });
+ const id=DEX_ORDER[DEX.sel],known=S.dex.includes(id),type=SP[id].t;
+ c.fillStyle='#f5f0e7';c.fillRect(20,358,600,82);
+ tx(known?SP[id].n+' — '+typeName(type):'Unknown creature',32,382,P.navy,18);
+ if(known){
+  tx('Strong vs '+winsAgainst(type).map(typeName).join(', '),32,402,P.teal,13);
+  tx('Weak to '+weakTo(type).map(typeName).join(', '),32,419,P.roof,13);
+  tx((SP[id].lore||'An inhabitant of the forgotten isles.').slice(0,82),320,419,P.navy,11);
+ }else tx('Bond with this creature to reveal its name, attributes and story.',32,415,P.navy,13);
+ tx('Arrows: Select  ·  Enter: Guide  ·  Esc: Close',W/2,462,P.off,13,'center');
+}
 function drawTitle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#142638');g.addColorStop(.45,P.violet);g.addColorStop(.72,P.gold);g.addColorStop(.73,P.teal);g.addColorStop(1,P.navy);c.fillStyle=g;c.fillRect(0,0,W,H);
  c.fillStyle=P.off;c.beginPath();c.arc(520,96,30,0,7);c.fill();for(let i=0;i<40;i++){c.fillStyle='rgba(245,240,231,.7)';c.fillRect((i*97)%W,(i*53)%150,2,2)}
  c.fillStyle='rgba(245,240,231,.25)';for(let i=0;i<14;i++)c.fillRect(((i*61+S.t/40)%W),360+(i*13)%110,36,3);
@@ -576,6 +645,7 @@ function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
    else{c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Loading map…',W/2,H/2,P.off,20,'center')}}
   else{S.mode='world'}
   drawMsg();
+  if(DEX)drawDex();
   if(S.fade>0.01){c.fillStyle='rgba(20,38,56,'+Math.min(1,S.fade)+')';c.fillRect(0,0,W,H)}
   drawLoading();
  }catch(err){console.error('draw',err);c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Draw error — use Reset view',W/2,H/2,P.off,16,'center');S.fade=0;fadeTarget=null}
@@ -585,14 +655,14 @@ function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
 function unstick(){S.fade=0;fadeTarget=null;S.loading=null;
  if(B){notify('In a battle: use the menu (Run to flee).',100);return}
  S.busy=false;S._warping=false;waiter=null;PARTY=null;DG=null;U=null;if(S.mode==='battle')S.mode='world';notify('View reset',90)}
-function dispatch(a){if(waiter){const w=waiter;waiter=null;w(a);return}
+function dispatch(a){if(DEX){dexInput(a);return}if(waiter){const w=waiter;waiter=null;w(a);return}
  if(S.mode==='title'){if(cloud.state==='loading')return;
   if(a==='ok'){if(canContinue())loadGame(true).then(ok=>{if(!ok)startNew()});else startNew();return}
   if(a==='new'&&canContinue()&&confirm('Start a new game? Your saved progress is replaced the next time the game saves.'))startNew();
   return}
- if(S.mode==='world'&&!S.busy&&!S.p.mv){if(a==='ok')interact();if(a==='party')openParty()}}
+ if(S.mode==='world'&&!S.busy&&!S.p.mv){if(a==='ok')interact();if(a==='party')openParty();if(a==='dex')openDex('dex');if(a==='guide')openDex('guide')}}
 const KM={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right',
- Enter:'ok',' ':'ok',e:'ok',z:'ok',n:'new',Escape:'back',x:'back',Backspace:'back',p:'party',P:'party'};
+ Enter:'ok',' ':'ok',e:'ok',z:'ok',n:'new',Escape:'back',x:'back',Backspace:'back',p:'party',P:'party',k:'dex',g:'guide'};
 const kd=a=>{if(a in held)held[a]=1;dispatch(a)},ku=a=>{if(a in held)held[a]=0};
 addEventListener('keydown',e=>{
  if(e.key==='F2'){S.insp=!S.insp;e.preventDefault();return}
@@ -605,6 +675,8 @@ document.querySelectorAll('#pad button').forEach(b=>{const a=b.dataset.a;b.addEv
 cv.addEventListener('pointerdown',()=>{if(S.mode==='title')dispatch('ok')});
 $('btn-reset').addEventListener('click',()=>unstick());
 $('btn-party').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)openParty()});
+$('btn-dex').addEventListener('click',()=>{if(DEX)DEX=null;else openDex('dex')});
+$('btn-guide').addEventListener('click',()=>{if(DEX)DEX.tab='guide';else openDex('guide')});
 $('btn-save').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)saveGame(true)});
 $('btn-load').addEventListener('click',()=>{if(S.mode==='title'||(S.mode==='world'&&!S.busy))loadGame(false)});
 $('btn-new').addEventListener('click',()=>{if((S.mode==='title'||(S.mode==='world'&&!S.busy&&!S.p.mv))&&confirm('Start a new game? Your saved progress is replaced the next time the game saves.')){startNew();notify('New game started.')}});
@@ -620,7 +692,9 @@ const TESTS=[
  ['Creatures have required stats',()=>['tarsilaw','bato','dagat'].every(id=>SP[id]&&SP[id].hp>0)],
  ['mkC produces valid party member',()=>{const c=mkC('tarsilaw',5);return c.hp===c.max&&c.mv.length>=3&&c.lv===5}],
  ['Type chart returns multipliers',()=>typeMult('Fire','Nature')>1&&typeMult('Water','Fire')>1],
- ['Species data is served by Django',()=>Object.keys(SP).length>=8&&LIM.max_party===3],
+ ['Dex includes 15 slots and two attribute counters',()=>DEX_ORDER.length===15&&weakTo('Fire').includes('Water')&&weakTo('Water').includes('Spark')],
+ ['Seven new species have usable sprites and moves',()=>['kidlatin','silong','arawan','ugbok','bulakna','habagat','liyaban'].every(id=>SP[id]&&MV[SP[id].a]&&crSpr(id))],
+ ['Species data is served by Django',()=>Object.keys(SP).length===15&&LIM.max_party===3],
  ['Stats formula matches server rules.py',()=>{const s=statsFor('tarsilaw',10);return s.max===48&&s.atk===13&&s.def===8&&s.spd===11}],
  ['Second move unlocks at level 7',()=>movesFor('lumot',6)[1]==='Tackle'&&movesFor('lumot',7)[1]==='Root Guard'],
  ['Level cap is enforced',()=>{const c=mkC('bato',29);gainXP(c,99999);return c.lv===LIM.max_level&&c.xp<c.next}],
