@@ -17,7 +17,22 @@ const images=new Map();
 function asset(path,fallback){
  if(!images.has(path)){
   const img=new Image();images.set(path,{img,ready:false});
-  img.onload=()=>{images.get(path).ready=true;
+  img.onload=()=>{
+   const entry=images.get(path);
+   if(path==='characters/player'){
+    // The source pack uses pale cyan eye pixels that look white at game scale.
+    // Darken only that exact eye-pixel palette color; keep the rest of the art.
+    const [sprite,ctx]=mk(img.width,img.height);
+    ctx.drawImage(img,0,0);
+    const pixels=ctx.getImageData(0,0,img.width,img.height);
+    for(let i=0;i<pixels.data.length;i+=4){
+     if(pixels.data[i]===187&&pixels.data[i+1]===245&&pixels.data[i+2]===245&&pixels.data[i+3]===255){
+      pixels.data[i]=63;pixels.data[i+1]=47;pixels.data[i+2]=44;
+     }
+    }
+    ctx.putImageData(pixels,0,0);entry.img=sprite;
+   }
+   entry.ready=true;
    // Map backgrounds were baked before the image arrived; regenerate their tiles.
    if(path.startsWith('tiles/')&&typeof MAPS!=='undefined')Object.values(MAPS).forEach(bake);
   };
