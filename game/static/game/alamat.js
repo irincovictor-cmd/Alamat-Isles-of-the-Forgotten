@@ -572,11 +572,34 @@ function drawBattle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'
  for(const q of[B.foe,B.me])q.dh+=(q.hp-q.dh)*.15;
  const bob=Math.sin(S.t/300)*3,sh=B.hit==='foe'&&((S.t/60|0)%2)?8:0,sm=B.hit==='me'&&((S.t/60|0)%2)?8:0;
  paintBattleCreature(c,B.foe.id,'front',390+sh,70+bob,160);paintBattleCreature(c,B.me.id,'back',70+sm,176-bob,192);
- box(24,24,270,64);tx(B.foe.n,40,52,P.navy,18);badgeType(B.foe.t,204,34,18);tx('Lv'+B.foe.lv,262,52,P.teal,14,'right');healthBar(40,62,236,B.foe.dh,B.foe.max);
- box(346,236,270,78);tx(B.me.n,362,260,P.navy,18);badgeType(B.me.t,508,243,18);tx('Lv'+B.me.lv,598,260,P.teal,14,'right');healthBar(362,270,236,B.me.dh,B.me.max);
- tx('HP '+Math.ceil(B.me.dh)+'/'+B.me.max+'   '+typeName(B.me.t)+'   Trust '+B.trust+'/5',362,296,P.navy,13);xpBar(362,304,160,B.me.xp/B.me.next);
- box(16,372,608,96);c.font='bold 18px "Trebuchet MS",system-ui,sans-serif';wrap(B.msg,B.ui?280:560).forEach((l,i)=>tx(l,32,408+i*26,P.navy,18));
- if(B.ui)B.ui.opts.forEach((o,i)=>{const x=340+(i%2)*140,y=388+((i/2)|0)*32;if(B.ui.sel===i){c.fillStyle=P.gold;c.fillRect(x-6,y-2,132,28)}tx(o,x,y+18,P.navy,16)})}
+ // Badge sits immediately after the name, never floating at the far edge of the panel.
+ box(24,24,270,64);
+ tx(B.foe.n,40,52,P.navy,18);
+ badgeType(B.foe.t,Math.min(219,40+c.measureText(B.foe.n).width+10),35,18);
+ tx('Lv'+B.foe.lv,270,52,P.teal,14,'right');
+ healthBar(40,62,236,B.foe.dh,B.foe.max);
+ box(346,236,270,78);
+ tx(B.me.n,362,260,P.navy,18);
+ badgeType(B.me.t,Math.min(541,362+c.measureText(B.me.n).width+10),244,18);
+ tx('Lv'+B.me.lv,600,260,P.teal,14,'right');
+ healthBar(362,270,236,B.me.dh,B.me.max);
+ // HP and Trust are the only battle status indicators here.
+ // XP remains available in Party; the old unlabeled XP bar resembled a loading bar
+ // and touched the bottom border of the status card.
+ tx('HP '+Math.ceil(B.me.dh)+'/'+B.me.max+'  ·  '+typeName(B.me.t)+'  ·  Trust '+B.trust+'/5',362,297,P.navy,13);
+ // Three properly spaced action rows, including Run, stay inside the battle panel.
+ box(16,356,608,112);
+ c.save();c.beginPath();c.rect(28,369,586,87);c.clip();
+ c.font='bold 17px "Trebuchet MS",system-ui,sans-serif';
+ wrap(B.msg,B.ui?273:558).slice(0,3).forEach((l,i)=>tx(l,32,390+i*25,P.navy,17));
+ if(B.ui)B.ui.opts.forEach((o,i)=>{
+  const x=340+(i%2)*136,y=371+Math.floor(i/2)*30;
+  if(B.ui.sel===i){c.fillStyle=P.gold;c.fillRect(x-3,y-1,128,27)}
+  c.font='bold 15px "Trebuchet MS",system-ui,sans-serif';
+  c.fillStyle=P.navy;c.textAlign='left';c.textBaseline='alphabetic';
+  c.fillText(o,x+7,y+19,112);
+ });
+ c.restore();}
 function drawParty(){if(!PARTY)return;c.fillStyle='rgba(20,38,56,.88)';c.fillRect(0,0,W,H);
  box(40,30,560,400);tx('Party',W/2,62,P.navy,24,'center');
  S.party.forEach((cr,i)=>{const y=90+i*90,sel=PARTY.sel===i&&PARTY.mode!=='summary';
