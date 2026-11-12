@@ -19,7 +19,7 @@
 | 001 | Tarsilaw | Light | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 002 | Agilunos | Gale (Wind) | **Yes** | **Yes** | **Yes** | No | **Shared UI loader fixed; verify in game** | **Battle ready — in progress** |
 | 003 | Bagaon | Flame (Fire) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
-| 004 | Alitaptap | Spark | No | No | No | No | Placeholder | Not started |
+| 004 | Alitaptap | Spark | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 005 | Lumot | Bloom (Nature) | No | No | No | No | Placeholder | Not started |
 | 006 | Pakpak | Shadow | No | No | No | No | Placeholder | Not started |
 | 007 | Bato | Stone (Earth) | No | No | No | No | Placeholder | Not started |
@@ -32,9 +32,18 @@
 | 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
 | 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 
-**Current counts:** 3 of 15 species have approved battle art (Tarsilaw, Agilunos and Bagaon); 0 of 15 are verified fully complete across all views. **12 creatures remain without approved designs.**
+**Current counts:** 4 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon and Alitaptap); 0 of 15 are verified fully complete across all views. **11 creatures remain without prepared designs.**
 
 ## Approved art notes
+
+### #004 Alitaptap
+
+- **Reference:** user-provided `alitaptap.png`, a 256×256 transparent 4×4 pose sheet (64×64 cells).
+- **Design:** indigo/violet firefly with large golden eyes, cyan translucent wings, two glowing antennae and a yellow-lit abdomen.
+- **Chosen front and menu:** row 1, column 1. **Back:** row 4, column 1 (rear view).
+- **Package:** [Alamat_Alitaptap_Battle_Assets.zip](https://drive.google.com/file/d/1gzfvP9NshxGwGotYxDt2HN2Gbt66bF19/view) in `Alamat Game Assets`.
+- **Expected paths:** `game/static/game/assets/creatures/alitaptap/battle/front.png`, `battle/back.png`, and `menu.png`.
+- **Pending:** user import/visual confirmation, overworld art. Do not regenerate without a user request.
 
 ### #003 Bagaon
 
