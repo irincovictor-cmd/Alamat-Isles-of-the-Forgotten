@@ -21,8 +21,8 @@
 | 003 | Bagaon | Flame (Fire) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 004 | Alitaptap | Spark | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 005 | Lumot | Bloom (Nature) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
-| 006 | Pakpak | Shadow | No | No | No | No | Placeholder | Not started |
-| 007 | Bato | Stone (Earth) | No | No | No | No | Placeholder | Not started |
+| 006 | Pakpak | Shadow | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 007 | Bato | Stone (Earth) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 008 | Dagat | Tide (Water) | No | No | No | No | Placeholder | Not started |
 | 009 | Kidlatin | Spark | No | No | No | No | Placeholder | Not started |
 | 010 | Silong | Shadow | No | No | No | No | Placeholder | Not started |
@@ -32,9 +32,27 @@
 | 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
 | 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 
-**Current counts:** 5 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon, Alitaptap and Lumot); 0 of 15 are verified fully complete across all views. **10 creatures remain without prepared designs.**
+**Current counts:** 7 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon, Alitaptap, Lumot, Pakpak and Bato); 0 of 15 are verified fully complete across all views. **8 creatures remain without prepared designs.**
 
 ## Approved art notes
+
+### #006 Pakpak
+
+- **Reference:** user-supplied `pakpak.png`, transparent 256×256 sheet (4×4, 64px cells).
+- **Locked design:** small purple-black bat guardian, red eyes, pointed ears, violet webbed wings and gray chest.
+- **Front/menu:** row 1 column 1; **back:** row 4 column 1.
+- **Package:** [Alamat_Pakpak_Battle_Assets.zip](https://drive.google.com/file/d/17jSw76vLBETucYCWUM70yu6q8VwxK2qj/view).
+- **Assets:** `game/static/game/assets/creatures/pakpak/battle/front.png`, `battle/back.png`, `menu.png`.
+- **Status:** battle art prepared, not yet visually verified in browser; overworld sprite not created. Don't regenerate unless user asks.
+
+### #007 Bato
+
+- **Reference:** user-supplied `bato.png`, transparent 256×256 sheet (4×4, 64px cells).
+- **Locked design:** dark gray rock-armored upright creature, warm sandstone torso, blue accents, yellow eyes, heavy stone fists.
+- **Front/menu:** row 1 column 1; **back:** row 4 column 1.
+- **Package:** [Alamat_Bato_Battle_Assets.zip](https://drive.google.com/file/d/10CyXE_XneKQ7M_ISYtrKtye1sW7cqRI4/view).
+- **Assets:** `game/static/game/assets/creatures/bato/battle/front.png`, `battle/back.png`, `menu.png`.
+- **Status:** battle art prepared, not yet visually verified in browser; overworld sprite not created. Don't regenerate unless user asks.
 
 ### #005 Lumot
 
