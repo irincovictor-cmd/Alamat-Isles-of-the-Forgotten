@@ -16,8 +16,8 @@
 
 | Dex # | Creature | Attribute | Approved concept | Battle front | Battle back | Overworld | Menu/Dex consistency | Overall status |
 |---|---|---|---|---|---|---|---|---|
-| 001 | Tarsilaw | Light | No | No | No | No | Placeholder | Not started |
-| 002 | Agilunos | Gale (Wind) | **Yes** | **Yes** | **Yes** | No | **Needs fix / verification** | **Battle ready — in progress** |
+| 001 | Tarsilaw | Light | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
+| 002 | Agilunos | Gale (Wind) | **Yes** | **Yes** | **Yes** | No | **Shared UI loader fixed; verify in game** | **Battle ready — in progress** |
 | 003 | Bagaon | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 | 004 | Alitaptap | Spark | No | No | No | No | Placeholder | Not started |
 | 005 | Lumot | Bloom (Nature) | No | No | No | No | Placeholder | Not started |
@@ -32,9 +32,19 @@
 | 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
 | 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 
-**Current counts:** 1 of 15 species has approved battle art (Agilunos); 0 of 15 are verified fully complete across all views. **14 creatures remain without approved designs.**
+**Current counts:** 2 of 15 species have approved battle art (Tarsilaw and Agilunos); 0 of 15 are verified fully complete across all views. **13 creatures remain without approved designs.**
 
 ## Approved art notes
+
+### #001 Tarsilaw
+
+- **Approved generated reference:** user-supplied transparent `tarsilaw.png`, 256×256 pixels arranged as a 4×4 pose sheet (16 cells of 64×64).
+- **Design locked:** small chestnut-brown tarsier-inspired guardian, large round golden eyes, cream belly, curling tail and upright rounded ears.
+- **Battle front/menu:** first row, first column. **Battle back:** third row, first column.
+- **Packaged assets:** [Alamat_Tarsilaw_Battle_Assets.zip](https://drive.google.com/file/d/1pvt6mmO3F7dsBRO-ERWU4zcCYJBkGZzh/view) in the user's Google Drive Alamat Game Assets folder.
+- **Folder layout:** `game/static/game/assets/creatures/tarsilaw/battle/front.png`, `battle/back.png`, `menu.png`.
+- **State:** art cropped and packaged; shared loader integrated with code, but still needs visual confirmation after importing ZIP. No overworld/idle sprite was prepared.
+- **Do not regenerate** Tarsilaw battle art unless the user explicitly asks to redesign it.
 
 ### #002 Agilunos
 
@@ -42,7 +52,7 @@
 - **Approved reference:** the user's PixelLab 4×4 pose sheet from November 12, 2026. Do **not** regenerate Agilunos just to improve minor poses.
 - **Battle art:** chosen front/back cropped sprites, distributed as `Alamat_Agilunos_Battle_Assets.zip` in the Alamat Game Assets Google Drive folder.
 - **Current code asset paths (until loader migration):** `game/static/game/assets/creatures/agilunos/battle_front.png` and `battle_back.png`.
-- **Open issues:** user confirmed the Dex still displays the old fallback portrait; update *all* UI locations (Dex, party, starter selection, title if applicable) to prefer approved art. Overworld sprite is not yet produced.
+- **UI integration:** shared UI sprite loader was updated to prefer menu art and battle front art across Dex, party, starter selection and title (commit `d76e8a2`). **Still needs player visual confirmation**, with Agilunos's old artwork ZIP installed locally. Overworld sprite is not yet produced.
 - **Do not mark Complete** before user verifies appearance in game.
 
 ## Required production workflow for each new creature
@@ -66,7 +76,7 @@ game/static/game/assets/creatures/<species_id>/
   menu.png                    # optional: fallback to battle/front.png
 ```
 
-**Migration caution:** These are **planned** paths. The current implemented battle loader still expects `battle_front.png` and `battle_back.png` directly inside the species folder. Do not place assets only in the planned paths until the game loader is updated and verified. Keep fallback support for the old path.
+**Implemented:** Starting with commit `d76e8a2`, battle art first checks `battle/front.png` and `battle/back.png`, then falls back to legacy `battle_front.png` and `battle_back.png`. UI screens first check `menu.png`, then the battle front, then the procedural sprite. The overworld paths remain reserved for a later field-art update.
 
 ## Art consistency rules
 
