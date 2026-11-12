@@ -22,3 +22,13 @@ PNG files placed here automatically replace matching procedural art after refres
 7. Record all third-party images and their licenses/attribution in `manifest.json`. CC0 typically needs no attribution; CC-BY does.
 
 The fallback renderer and asset filenames are maintained in `game/static/game/alamat.js`.
+
+## Last tick 2D Forest 128×128 atlas integration
+
+The environment renderer supports two **optional 512×512 transparent sprite atlases**:
+- `environment/forest/green.png` — copy the creator's `tree1.png` here. Used for leafy trees in Lumina Village and Balete Forest.
+- `environment/forest/bare.png` — copy `tree2.png` here. Used for leafless trees around the Ancient Shrine.
+
+Each atlas contains 15 tree sprites arranged in a 4×4 grid of 128×128 cells; the sixteenth cell is empty. The renderer selects a stable variant based on map coordinates, scales each tree to 112×112 pixels, anchors the sprite at its trunk tile, and keeps the original one-tile collision plus scene depth ordering. Palm trees stay procedural. If either PNG is absent, the existing hand-drawn tree art remains as fallback.
+
+**Academic asset permission:** The creator of this tree pack granted academic-use permission to the project owner. This repository intentionally does not include the licensed tree PNGs: obtain them from the creator and place them at the paths above. Redistribution in a public source repository requires separately confirmed permission. Source: https://last-tick.itch.io/2d-forest-free-128x128.
