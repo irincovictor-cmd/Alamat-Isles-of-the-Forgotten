@@ -103,6 +103,27 @@ class SanitizeSaveTests(TestCase):
                                                   dex=['tarsilaw', 'kidlatin']))
         self.assertEqual(clean['dex'], ['tarsilaw', 'bato', 'kidlatin'])
 
+    def test_reserve_roundtrip_and_dex_unlock(self):
+        reserve = [rules.make_creature('bato', 5), rules.make_creature('pakpak', 7)]
+        clean, adj = rules.sanitize_save(valid_save(storage=reserve))
+        self.assertEqual(adj, [])
+        self.assertEqual([x['id'] for x in clean['storage']], ['bato', 'pakpak'])
+        self.assertEqual(clean['dex'], ['tarsilaw', 'pakpak', 'bato'])
+        self.assertEqual(rules.sanitize_save(clean)[0], clean)
+
+    def test_reserve_limit_and_corruption_rejected(self):
+        cap = rules.LIMITS['max_storage']
+        self.assertEqual(cap, 30)
+        reserve = [rules.make_creature('bato', 5) for _ in range(cap)]
+        self.assertEqual(len(rules.sanitize_save(valid_save(storage=reserve))[0]['storage']), cap)
+        for value in ('oops', [{'id': 'not-a-species'}], reserve + reserve[:1]):
+            with self.assertRaises(rules.SaveError):
+                rules.sanitize_save(valid_save(storage=value))
+
+    def test_legacy_saves_have_empty_reserve(self):
+        clean, _ = rules.sanitize_save(valid_save())
+        self.assertEqual(clean['storage'], [])
+
     def test_empty_save_is_allowed(self):
         self.assertEqual(rules.sanitize_save({}), ({}, []))
 
@@ -481,6 +502,32 @@ class ApiSaveTests(CacheClearMixin, TestCase):
         c = APIClient()
         c.force_authenticate(other)
         self.assertEqual(c.get('/api/save/').json()['data'], {})
+
+    def test_admin_roster_requires_staff_and_debug(self):
+        url = '/api/dev/seed-roster/'
+        current = self.api.get('/api/save/').json()['revision']
+        self.assertEqual(self.api.post(url, {'revision': current}, format='json').status_code, 403)
+        self.user.is_staff = True
+        self.user.save(update_fields=['is_staff'])
+        with override_settings(DEBUG=False):
+            self.assertEqual(self.api.post(url, {'revision': current}, format='json').status_code, 403)
+        with override_settings(DEBUG=True):
+            r = self.api.post(url, {'revision': current}, format='json')
+            self.assertEqual(r.status_code, 200)
+            data = r.json()['data']
+            self.assertEqual(len(data['party']), 3)
+            self.assertEqual(len(data['storage']), 12)
+            self.assertEqual(len(data['dex']), 15)
+            self.assertEqual({c['id'] for c in data['party'] + data['storage']},
+                             set(rules.SPECIES))
+            self.assertEqual(self.api.post(url, {'revision': current}, format='json').status_code, 409)
+
+    def test_reserve_survives_authenticated_cloud_save(self):
+        reserve = [rules.make_creature('pakpak', 5), rules.make_creature('bato', 6)]
+        r = self.put(valid_save(storage=reserve))
+        self.assertEqual(r.status_code, 200)
+        out = self.api.get('/api/save/').json()['data']
+        self.assertEqual([c['id'] for c in out['storage']], ['pakpak', 'bato'])
 
     def test_session_auth_requires_csrf_for_writes(self):
         c = Client(enforce_csrf_checks=True)
