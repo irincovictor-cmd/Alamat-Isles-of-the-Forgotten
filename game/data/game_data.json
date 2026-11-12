@@ -1,265 +1,496 @@
 {
- "_comment": "Single source of truth for species/moves/type chart. Read by Django (game/rules.py) and injected into the client via json_script. Balance numbers are provisional (see docs/GAME_DESIGN.md).",
- "limits": {
-  "max_party": 3,
-  "max_level": 30,
-  "max_items": 99,
-  "xp_per_level": 25,
-  "starter_level": 5
- },
- "maps": {
-  "V": {
-   "name": "Lumina Village",
-   "w": 40,
-   "h": 30,
-   "spawn": [
-    19,
-    17
-   ]
+  "_comment": "Single source of truth for species/moves/type chart. Read by Django (game/rules.py) and injected into the client via json_script. Balance numbers are provisional (see docs/GAME_DESIGN.md).",
+  "limits": {
+    "max_party": 3,
+    "max_level": 30,
+    "max_items": 99,
+    "xp_per_level": 25,
+    "starter_level": 5
   },
-  "F": {
-   "name": "Balete Forest",
-   "w": 30,
-   "h": 24,
-   "spawn": [
-    14,
-    22
-   ]
+  "maps": {
+    "V": {
+      "name": "Lumina Village",
+      "w": 40,
+      "h": 30,
+      "spawn": [
+        19,
+        17
+      ]
+    },
+    "F": {
+      "name": "Balete Forest",
+      "w": 30,
+      "h": 24,
+      "spawn": [
+        14,
+        22
+      ]
+    },
+    "S": {
+      "name": "Ancient Shrine",
+      "w": 16,
+      "h": 12,
+      "spawn": [
+        7,
+        10
+      ]
+    }
   },
-  "S": {
-   "name": "Ancient Shrine",
-   "w": 16,
-   "h": 12,
-   "spawn": [
-    7,
-    10
-   ]
+  "flags": [
+    "starter",
+    "bonded",
+    "shrine",
+    "gift",
+    "done"
+  ],
+  "species": {
+    "tarsilaw": {
+      "n": "Tarsilaw",
+      "t": "Light",
+      "hp": 34,
+      "atk": 9,
+      "def": 6,
+      "spd": 8,
+      "a": "Leaf Pounce",
+      "xp": 40,
+      "up": "Vine Whip",
+      "up_lv": 7,
+      "starter": true,
+      "origin": "original_species",
+      "lore": "A bright-eyed forest watcher that senses hidden paths."
+    },
+    "agilunos": {
+      "n": "Agilunos",
+      "t": "Wind",
+      "hp": 30,
+      "atk": 11,
+      "def": 5,
+      "spd": 11,
+      "a": "Talon Dive",
+      "xp": 42,
+      "up": "Sky Cut",
+      "up_lv": 7,
+      "starter": true,
+      "origin": "original_species",
+      "lore": "A proud eagle guardian of the highland skies."
+    },
+    "bagaon": {
+      "n": "Bagaon",
+      "t": "Fire",
+      "hp": 38,
+      "atk": 10,
+      "def": 8,
+      "spd": 5,
+      "a": "Ember Slam",
+      "xp": 45,
+      "up": "Flame Lick",
+      "up_lv": 7,
+      "starter": true,
+      "origin": "original_species",
+      "lore": "A stubborn ember beast whose footsteps warm the ground."
+    },
+    "alitaptap": {
+      "n": "Alitaptap",
+      "t": "Spark",
+      "hp": 24,
+      "atk": 8,
+      "def": 5,
+      "spd": 9,
+      "a": "Glow Burst",
+      "xp": 28,
+      "up": "Spirit Pulse",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A swift firefly spirit that startles foes with flashes."
+    },
+    "lumot": {
+      "n": "Lumot",
+      "t": "Nature",
+      "hp": 30,
+      "atk": 7,
+      "def": 7,
+      "spd": 4,
+      "a": "Moss Slap",
+      "xp": 26,
+      "up": "Root Guard",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A gentle moss creature that guards forest roots."
+    },
+    "pakpak": {
+      "n": "Pakpak",
+      "t": "Shadow",
+      "hp": 26,
+      "atk": 9,
+      "def": 4,
+      "spd": 10,
+      "a": "Gust Bite",
+      "xp": 30,
+      "up": "Quick Gust",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A night-wing wanderer that slips between shadows."
+    },
+    "bato": {
+      "n": "Bato",
+      "t": "Earth",
+      "hp": 36,
+      "atk": 8,
+      "def": 10,
+      "spd": 3,
+      "a": "Stone Roll",
+      "xp": 32,
+      "up": null,
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A patient stone guardian with a protective shell."
+    },
+    "dagat": {
+      "n": "Dagat",
+      "t": "Water",
+      "hp": 32,
+      "atk": 8,
+      "def": 6,
+      "spd": 7,
+      "a": "Tide Snap",
+      "xp": 34,
+      "up": null,
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A coastal waterling that follows the rhythm of tides."
+    },
+    "kidlatin": {
+      "n": "Kidlatin",
+      "t": "Spark",
+      "hp": 27,
+      "atk": 10,
+      "def": 5,
+      "spd": 12,
+      "a": "Thunder Snap",
+      "xp": 36,
+      "up": "Voltage Rush",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A quick storm-runner that dances through sudden rain."
+    },
+    "silong": {
+      "n": "Silong",
+      "t": "Shadow",
+      "hp": 31,
+      "atk": 10,
+      "def": 6,
+      "spd": 9,
+      "a": "Night Claw",
+      "xp": 38,
+      "up": "Shade Veil",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A quiet cave stalker that hides in dusk."
+    },
+    "arawan": {
+      "n": "Arawan",
+      "t": "Light",
+      "hp": 34,
+      "atk": 9,
+      "def": 7,
+      "spd": 8,
+      "a": "Sun Ray",
+      "xp": 39,
+      "up": "Dawn Gleam",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A radiant guardian that appears with morning light."
+    },
+    "ugbok": {
+      "n": "Ugbok",
+      "t": "Earth",
+      "hp": 42,
+      "atk": 9,
+      "def": 12,
+      "spd": 3,
+      "a": "Mud Bash",
+      "xp": 42,
+      "up": "Crag Crash",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A heavy mud-and-stone protector of mountain trails."
+    },
+    "bulakna": {
+      "n": "Bulakna",
+      "t": "Nature",
+      "hp": 29,
+      "atk": 9,
+      "def": 6,
+      "spd": 8,
+      "a": "Petal Dart",
+      "xp": 34,
+      "up": "Bloom Bind",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A blooming vine creature that flourishes after rain."
+    },
+    "habagat": {
+      "n": "Habagat",
+      "t": "Wind",
+      "hp": 29,
+      "atk": 11,
+      "def": 5,
+      "spd": 12,
+      "a": "Wind Slice",
+      "xp": 40,
+      "up": "Monsoon Rush",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A restless monsoon spirit that rides tropical winds."
+    },
+    "liyaban": {
+      "n": "Liyaban",
+      "t": "Fire",
+      "hp": 31,
+      "atk": 12,
+      "def": 5,
+      "spd": 9,
+      "a": "Cinder Peck",
+      "xp": 41,
+      "up": "Fire Crest",
+      "up_lv": 7,
+      "starter": false,
+      "origin": "original_species",
+      "lore": "A flame-crested bird that guards glowing embers."
+    }
+  },
+  "moves": {
+    "Leaf Pounce": {
+      "p": 9,
+      "t": "Light"
+    },
+    "Talon Dive": {
+      "p": 10,
+      "t": "Wind"
+    },
+    "Ember Slam": {
+      "p": 10,
+      "t": "Fire"
+    },
+    "Glow Burst": {
+      "p": 9,
+      "t": "Spark"
+    },
+    "Moss Slap": {
+      "p": 8,
+      "t": "Nature"
+    },
+    "Gust Bite": {
+      "p": 9,
+      "t": "Shadow"
+    },
+    "Stone Roll": {
+      "p": 9,
+      "t": "Earth"
+    },
+    "Tide Snap": {
+      "p": 9,
+      "t": "Water"
+    },
+    "Tackle": {
+      "p": 6,
+      "t": "Normal"
+    },
+    "Soothe": {
+      "k": 1
+    },
+    "Vine Whip": {
+      "p": 11,
+      "t": "Light"
+    },
+    "Sky Cut": {
+      "p": 12,
+      "t": "Wind"
+    },
+    "Flame Lick": {
+      "p": 11,
+      "t": "Fire"
+    },
+    "Spirit Pulse": {
+      "p": 10,
+      "t": "Spark"
+    },
+    "Root Guard": {
+      "p": 0,
+      "t": "Nature",
+      "def": 1
+    },
+    "Quick Gust": {
+      "p": 7,
+      "t": "Shadow"
+    },
+    "Thunder Snap": {
+      "p": 10,
+      "t": "Spark"
+    },
+    "Voltage Rush": {
+      "p": 12,
+      "t": "Spark"
+    },
+    "Night Claw": {
+      "p": 10,
+      "t": "Shadow"
+    },
+    "Shade Veil": {
+      "p": 12,
+      "t": "Shadow"
+    },
+    "Sun Ray": {
+      "p": 10,
+      "t": "Light"
+    },
+    "Dawn Gleam": {
+      "p": 12,
+      "t": "Light"
+    },
+    "Mud Bash": {
+      "p": 10,
+      "t": "Earth"
+    },
+    "Crag Crash": {
+      "p": 12,
+      "t": "Earth"
+    },
+    "Petal Dart": {
+      "p": 10,
+      "t": "Nature"
+    },
+    "Bloom Bind": {
+      "p": 12,
+      "t": "Nature"
+    },
+    "Wind Slice": {
+      "p": 10,
+      "t": "Wind"
+    },
+    "Monsoon Rush": {
+      "p": 12,
+      "t": "Wind"
+    },
+    "Cinder Peck": {
+      "p": 10,
+      "t": "Fire"
+    },
+    "Fire Crest": {
+      "p": 12,
+      "t": "Fire"
+    }
+  },
+  "type_chart": {
+    "Fire": {
+      "Nature": 1.5,
+      "Shadow": 1.5,
+      "Water": 0.7,
+      "Earth": 0.7
+    },
+    "Water": {
+      "Fire": 1.5,
+      "Earth": 1.5,
+      "Spark": 0.7,
+      "Nature": 0.7
+    },
+    "Earth": {
+      "Wind": 1.5,
+      "Spark": 1.5,
+      "Fire": 1.5,
+      "Light": 1.5,
+      "Water": 0.7,
+      "Nature": 0.7
+    },
+    "Nature": {
+      "Water": 1.5,
+      "Earth": 1.5,
+      "Fire": 0.7,
+      "Wind": 0.7
+    },
+    "Wind": {
+      "Nature": 1.5,
+      "Light": 1.5,
+      "Earth": 0.7,
+      "Spark": 0.7
+    },
+    "Spark": {
+      "Water": 1.5,
+      "Wind": 1.5,
+      "Earth": 0.7,
+      "Light": 0.7
+    },
+    "Light": {
+      "Shadow": 1.5,
+      "Spark": 1.5,
+      "Wind": 0.7,
+      "Earth": 0.7
+    },
+    "Shadow": {
+      "Light": 1.5,
+      "Nature": 1.5,
+      "Fire": 0.7
+    },
+    "Normal": {}
+  },
+  "dex_order": [
+    "tarsilaw",
+    "agilunos",
+    "bagaon",
+    "alitaptap",
+    "lumot",
+    "pakpak",
+    "bato",
+    "dagat",
+    "kidlatin",
+    "silong",
+    "arawan",
+    "ugbok",
+    "bulakna",
+    "habagat",
+    "liyaban"
+  ],
+  "attribute_names": {
+    "Fire": "Flame",
+    "Water": "Tide",
+    "Earth": "Stone",
+    "Nature": "Bloom",
+    "Wind": "Gale",
+    "Spark": "Spark",
+    "Light": "Light",
+    "Shadow": "Shadow"
+  },
+  "encounters": {
+    "F": [
+      "alitaptap",
+      "lumot",
+      "pakpak",
+      "bato",
+      "kidlatin",
+      "silong",
+      "bulakna",
+      "habagat"
+    ],
+    "S": [
+      "alitaptap",
+      "dagat",
+      "bato",
+      "pakpak",
+      "arawan",
+      "ugbok",
+      "liyaban",
+      "kidlatin"
+    ]
   }
- },
- "flags": [
-  "starter",
-  "bonded",
-  "shrine",
-  "gift",
-  "done"
- ],
- "species": {
-  "tarsilaw": {
-   "n": "Tarsilaw",
-   "t": "Nature",
-   "hp": 34,
-   "atk": 9,
-   "def": 6,
-   "spd": 8,
-   "a": "Leaf Pounce",
-   "xp": 40,
-   "up": "Vine Whip",
-   "up_lv": 7,
-   "starter": true,
-   "origin": "original_species"
-  },
-  "agilunos": {
-   "n": "Agilunos",
-   "t": "Wind",
-   "hp": 30,
-   "atk": 11,
-   "def": 5,
-   "spd": 11,
-   "a": "Talon Dive",
-   "xp": 42,
-   "up": "Sky Cut",
-   "up_lv": 7,
-   "starter": true,
-   "origin": "original_species"
-  },
-  "bagaon": {
-   "n": "Bagaon",
-   "t": "Fire",
-   "hp": 38,
-   "atk": 10,
-   "def": 8,
-   "spd": 5,
-   "a": "Ember Slam",
-   "xp": 45,
-   "up": "Flame Lick",
-   "up_lv": 7,
-   "starter": true,
-   "origin": "original_species"
-  },
-  "alitaptap": {
-   "n": "Alitaptap",
-   "t": "Spirit",
-   "hp": 24,
-   "atk": 8,
-   "def": 5,
-   "spd": 9,
-   "a": "Glow Burst",
-   "xp": 28,
-   "up": "Spirit Pulse",
-   "up_lv": 7,
-   "starter": false,
-   "origin": "original_species"
-  },
-  "lumot": {
-   "n": "Lumot",
-   "t": "Nature",
-   "hp": 30,
-   "atk": 7,
-   "def": 7,
-   "spd": 4,
-   "a": "Moss Slap",
-   "xp": 26,
-   "up": "Root Guard",
-   "up_lv": 7,
-   "starter": false,
-   "origin": "original_species"
-  },
-  "pakpak": {
-   "n": "Pakpak",
-   "t": "Wind",
-   "hp": 26,
-   "atk": 9,
-   "def": 4,
-   "spd": 10,
-   "a": "Gust Bite",
-   "xp": 30,
-   "up": "Quick Gust",
-   "up_lv": 7,
-   "starter": false,
-   "origin": "original_species"
-  },
-  "bato": {
-   "n": "Bato",
-   "t": "Earth",
-   "hp": 36,
-   "atk": 8,
-   "def": 10,
-   "spd": 3,
-   "a": "Stone Roll",
-   "xp": 32,
-   "up": null,
-   "up_lv": 7,
-   "starter": false,
-   "origin": "original_species"
-  },
-  "dagat": {
-   "n": "Dagat",
-   "t": "Water",
-   "hp": 32,
-   "atk": 8,
-   "def": 6,
-   "spd": 7,
-   "a": "Tide Snap",
-   "xp": 34,
-   "up": null,
-   "up_lv": 7,
-   "starter": false,
-   "origin": "original_species"
-  }
- },
- "moves": {
-  "Leaf Pounce": {
-   "p": 9,
-   "t": "Nature"
-  },
-  "Talon Dive": {
-   "p": 10,
-   "t": "Wind"
-  },
-  "Ember Slam": {
-   "p": 10,
-   "t": "Fire"
-  },
-  "Glow Burst": {
-   "p": 9,
-   "t": "Spirit"
-  },
-  "Moss Slap": {
-   "p": 8,
-   "t": "Nature"
-  },
-  "Gust Bite": {
-   "p": 9,
-   "t": "Wind"
-  },
-  "Stone Roll": {
-   "p": 9,
-   "t": "Earth"
-  },
-  "Tide Snap": {
-   "p": 9,
-   "t": "Water"
-  },
-  "Tackle": {
-   "p": 6,
-   "t": "Normal"
-  },
-  "Soothe": {
-   "k": 1
-  },
-  "Vine Whip": {
-   "p": 11,
-   "t": "Nature"
-  },
-  "Sky Cut": {
-   "p": 12,
-   "t": "Wind"
-  },
-  "Flame Lick": {
-   "p": 11,
-   "t": "Fire"
-  },
-  "Spirit Pulse": {
-   "p": 10,
-   "t": "Spirit"
-  },
-  "Root Guard": {
-   "p": 0,
-   "t": "Nature",
-   "def": 1
-  },
-  "Quick Gust": {
-   "p": 7,
-   "t": "Wind"
-  }
- },
- "type_chart": {
-  "Nature": {
-   "Water": 1.5,
-   "Earth": 1.5,
-   "Fire": 0.7,
-   "Wind": 1
-  },
-  "Fire": {
-   "Nature": 1.5,
-   "Wind": 1.2,
-   "Water": 0.7,
-   "Earth": 0.8
-  },
-  "Water": {
-   "Fire": 1.5,
-   "Earth": 1.3,
-   "Nature": 0.8,
-   "Wind": 1
-  },
-  "Wind": {
-   "Nature": 1.2,
-   "Spirit": 1.2,
-   "Earth": 0.7,
-   "Fire": 1
-  },
-  "Earth": {
-   "Fire": 1.2,
-   "Wind": 1.3,
-   "Water": 0.7,
-   "Nature": 0.9
-  },
-  "Spirit": {
-   "Spirit": 1.3,
-   "Nature": 1.1,
-   "Wind": 0.9,
-   "Earth": 1
-  },
-  "Normal": {}
- }
 }
