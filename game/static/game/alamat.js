@@ -33,8 +33,11 @@ function drawActor(ctx,pal,dir,frame,x,y){
  const fallback=charSprite(pal,dir,frame),img=asset(key,fallback);
  if(img===fallback){ctx.drawImage(fallback,x,y);return}
  // Sprite sheet: four columns (frames), four rows (down/up/left/right), 64x64 cells.
- if(img.width===128&&img.height===192)ctx.drawImage(img,(frame%4)*32,dir*48,32,48,x+16,y+15,32,48);
- else if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,dir*64,64,64,x,y,64,64);
+ // Legacy Szadi player sheets were exported in side/back/front/mirrored-side order.
+ // The game's movement direction order is down/up/left/right.
+ const sourceDir=pal.id==='pl'&&img.width===256&&img.height===256?[2,1,0,3][dir]:dir;
+ if(img.width===128&&img.height===192)ctx.drawImage(img,(frame%4)*32,sourceDir*48,32,48,x+16,y+15,32,48);
+ else if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,sourceDir*64,64,64,x,y,64,64);
  else ctx.drawImage(img,x,y,64,64); // single-frame portraits are also supported
 }
 function drawObject(ctx,o,x,y){
