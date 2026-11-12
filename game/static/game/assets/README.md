@@ -57,3 +57,7 @@ With the atlas installed, Lumina Village uses textured grass, dirt, sand and sha
 Source: Ridge Works Studios, *Pocket Atlas Essentials*: https://ridgeworksstudio.itch.io/pocket-atlas-essentials. The included license permits personal/commercial project use and modification and prohibits resale/redistribution of the assets on their own or in another asset pack. The assembled atlas is therefore distributed only within the owner's private asset workflow.
 
 Note: Current auto-tiling supports direct cardinal edges and adjacent outer corners. More complex mixed-terrain junctions and shoreline animation may need a later art pass after visual testing.
+
+## Agilunos battle front/back sprites
+
+The game now loads optional `creatures/agilunos/battle_front.png` and `creatures/agilunos/battle_back.png` for enemy and allied battle perspectives respectively. Both are transparent 64×64 PNG crops chosen from the owner's PixelLab generation. These PNGs are separate from the older overworld `creatures/agilunos.png` and are shown at battle scale using nearest-neighbor rendering. All other species continue to use their existing artwork until their own battle sprites are added. Missing front/back images fall back to the procedural creature sprite. The private asset package is `Alamat_Agilunos_Battle_Assets.zip` in the Google Drive folder `Alamat Game Assets`.
