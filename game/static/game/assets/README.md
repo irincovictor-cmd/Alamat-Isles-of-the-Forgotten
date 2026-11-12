@@ -32,3 +32,13 @@ The environment renderer supports two **optional 512×512 transparent sprite atl
 Each atlas contains 15 tree sprites arranged in a 4×4 grid of 128×128 cells; the sixteenth cell is empty. The renderer selects a stable variant based on map coordinates, scales each tree to 112×112 pixels, anchors the sprite at its trunk tile, and keeps the original one-tile collision plus scene depth ordering. Palm trees stay procedural. If either PNG is absent, the existing hand-drawn tree art remains as fallback.
 
 **Academic asset permission:** The creator of this tree pack granted academic-use permission to the project owner. This repository intentionally does not include the licensed tree PNGs: obtain them from the creator and place them at the paths above. Redistribution in a public source repository requires separately confirmed permission. Source: https://last-tick.itch.io/2d-forest-free-128x128.
+
+## The Quiet Village Pack — buildings
+
+To replace the current code-drawn village buildings, place the original `Buildings.png` atlas at:
+
+`game/static/game/assets/environment/buildings/quiet_village.png`
+
+The game uses the original 1227×1067 RGBA atlas directly; no manual sprite cutting is required. The five existing village houses receive different roof colors/variants. Building interaction markers and collision remain as before. The atlas is an optional visual override, and the procedural houses remain available when it is missing.
+
+Original pack: *The Quiet Village Pack*, Pixelscape Studio. The included README permits personal and commercial game use and modifications and says credit is appreciated. It prohibits reselling/redistributing original or modified assets as standalone files. Keep the PNG in your local project rather than publishing it as an independently downloadable raw asset pack. The building visuals are still undergoing in-game scale testing.
