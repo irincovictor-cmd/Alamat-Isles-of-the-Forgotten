@@ -182,7 +182,19 @@ function genericCreature(x,id){
 const CS={};const crSpr=id=>asset('creatures/'+id,CS[id]||(()=>{const[e,x]=mk(32,32);(CR[id]||((ctx)=>genericCreature(ctx,id)))(x);return CS[id]=e})());
 // Optional battle-specific artwork: enemy front / allied back.
 // Missing files retain the existing 32x32 procedural creature sprite.
-function battleSprite(id,view){return asset('creatures/'+id+'/battle_'+view,crSpr(id));}
+// Dedicated art locations (new names first; legacy names remain supported).
+function battleSprite(id,view){
+ return asset('creatures/'+id+'/battle/'+view,
+   asset('creatures/'+id+'/battle_'+view,crSpr(id)));
+}
+function uiSprite(id){
+ return asset('creatures/'+id+'/menu',
+   battleSprite(id,'front'));
+}
+function drawUiCreature(id,x,y,w,h){
+ const img=uiSprite(id);
+ c.drawImage(img,0,0,img.width,img.height,x,y,w,h);
+}
 function paintBattleCreature(ctx,id,view,x,y,size){
  const img=battleSprite(id,view);
  ctx.imageSmoothingEnabled=false;
@@ -521,7 +533,7 @@ function drawWorld(){const m=S.map,p=S.p,cx=Math.max(0,Math.min(m.w*T-W,Math.rou
  c.fillStyle='rgba(20,38,56,.78)';c.fillRect(8,8,W-16,30);tx(m.name+' · '+objective(),18,29,P.off,14);tx('Selyo ×'+S.selyo+'  Herb ×'+S.herbs,W-18,29,P.gold,14,'right')}
 function drawPick(){if(!U)return;c.fillStyle='rgba(20,38,56,.82)';c.fillRect(0,0,W,H);tx('Choose your partner',W/2,52,P.gold,28,'center');
  U.ids.forEach((id,i)=>{const s=SP[id],x=26+i*204,sel=U.sel===i;c.fillStyle=sel?P.gold:P.off;c.fillRect(x-4,76-4,188,308);c.fillStyle=P.off;c.fillRect(x,76,180,300);c.fillStyle=P.navy;c.fillRect(x,76,180,28);tx(s.n,x+90,97,P.off,18,'center');
-  c.fillStyle='rgba(118,216,210,.25)';c.fillRect(x+8,112,164,150);c.drawImage(crSpr(id),0,0,32,32,x+26,118+(sel?Math.sin(S.t/200)*3:0),128,128);
+  c.fillStyle='rgba(118,216,210,.25)';c.fillRect(x+8,112,164,150);drawUiCreature(id,x+26,118+(sel?Math.sin(S.t/200)*3:0),128,128);
   tx(s.t,x+90,286,P.teal,16,'center');tx('HP '+s.hp+'  ATK '+s.atk,x+90,312,P.navy,14,'center');tx('DEF '+s.def+'  SPD '+s.spd,x+90,334,P.navy,14,'center');tx(sel?'Press Enter':'',x+90,362,P.roof,14,'center')});
  tx('◀ ▶ to look · Enter to choose (original species)',W/2,430,P.off,15,'center')}
 function drawDlg(){if(!DG)return;box(16,372,608,96);if(DG.n){c.fillStyle=P.teal;c.fillRect(30,354,160,26);tx(DG.n,40,373,P.off,16)}
@@ -541,14 +553,14 @@ function drawParty(){if(!PARTY)return;c.fillStyle='rgba(20,38,56,.88)';c.fillRec
  box(40,30,560,400);tx('Party',W/2,62,P.navy,24,'center');
  S.party.forEach((cr,i)=>{const y=90+i*90,sel=PARTY.sel===i&&PARTY.mode!=='summary';
   if(sel){c.fillStyle='rgba(241,198,106,.35)';c.fillRect(60,y-8,520,82)}
-  c.drawImage(crSpr(cr.id),0,0,32,32,70,y,64,64);
+  drawUiCreature(cr.id,70,y,64,64);
   tx(cr.n+'  Lv'+cr.lv+'  '+cr.t,150,y+22,P.navy,18);bar(150,y+32,280,cr.hp/cr.max);
   tx('HP '+cr.hp+'/'+cr.max+'   ATK '+cr.atk+' DEF '+cr.def+' SPD '+cr.spd,150,y+58,P.navy,13);
   xpBar(150,y+66,200,cr.xp/cr.next)});
  if(PARTY.mode==='act'){const acts=['Summary','Use Herb','Close'];box(380,300,200,110);
   acts.forEach((a,i)=>{if(PARTY.actSel===i){c.fillStyle=P.gold;c.fillRect(396,318+i*28,168,26)}tx(a,410,338+i*28,P.navy,16)})}
  if(PARTY.mode==='summary'){const cr=S.party[PARTY.sel];box(120,80,400,300);tx(cr.n+' — Summary',W/2,112,P.navy,20,'center');
-  c.drawImage(crSpr(cr.id),0,0,32,32,W/2-48,130,96,96);
+  drawUiCreature(cr.id,W/2-48,130,96,96);
   tx('Level '+cr.lv+'  ·  '+cr.t,W/2,250,P.teal,16,'center');
   tx('HP '+cr.hp+'/'+cr.max+'   XP '+cr.xp+'/'+cr.next,W/2,280,P.navy,15,'center');
   tx('ATK '+cr.atk+'  DEF '+cr.def+'  SPD '+cr.spd,W/2,308,P.navy,15,'center');
@@ -594,7 +606,7 @@ function drawDex(){
   const col=i%5,row=Math.floor(i/5),x=20+col*122,y=77+row*91,known=S.dex.includes(id);
   c.fillStyle=i===DEX.sel?'#f1c66a':'#d7e2d4';c.fillRect(x,y,112,83);
   c.fillStyle='#263d42';c.fillRect(x+4,y+4,104,75);
-  const img=crSpr(id);
+  const img=uiSprite(id);
   c.save();if(!known)c.filter='brightness(0)';
   c.drawImage(img,0,0,img.width,img.height,x+32,y+3,48,48);c.restore();
   tx('#'+String(i+1).padStart(3,'0'),x+7,y+15,P.gold,10);
@@ -613,7 +625,7 @@ function drawDex(){
 function drawTitle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#142638');g.addColorStop(.45,P.violet);g.addColorStop(.72,P.gold);g.addColorStop(.73,P.teal);g.addColorStop(1,P.navy);c.fillStyle=g;c.fillRect(0,0,W,H);
  c.fillStyle=P.off;c.beginPath();c.arc(520,96,30,0,7);c.fill();for(let i=0;i<40;i++){c.fillStyle='rgba(245,240,231,.7)';c.fillRect((i*97)%W,(i*53)%150,2,2)}
  c.fillStyle='rgba(245,240,231,.25)';for(let i=0;i<14;i++)c.fillRect(((i*61+S.t/40)%W),360+(i*13)%110,36,3);
- ['tarsilaw','agilunos','bagaon'].forEach((id,i)=>c.drawImage(crSpr(id),0,0,32,32,86+i*190,258+Math.sin(S.t/350+i)*4,128,128));
+ ['tarsilaw','agilunos','bagaon'].forEach((id,i)=>drawUiCreature(id,86+i*190,258+Math.sin(S.t/350+i)*4,128,128));
  tx('ALAMAT',W/2+4,184,P.navy,78,'center');tx('ALAMAT',W/2,180,P.gold,78,'center');tx('ISLES OF THE FORGOTTEN',W/2,224,P.off,24,'center');
  if(cloud.state==='loading')tx('Loading your save…',W/2,430,P.off,20,'center');
  else if((S.t/500|0)%2)tx(canContinue()?'Press Enter or tap to continue':'Press Enter or tap to begin',W/2,430,P.off,20,'center');
