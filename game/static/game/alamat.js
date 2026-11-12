@@ -76,34 +76,20 @@ function drawObject(ctx,o,x,y){
    return;
   }
  }
- // Szadi's Houses Pack is a modular 1024x1024 atlas. Assemble complete
- // facades from individual roof and wall sections instead of cropping across
- // transparent gaps and adjacent sprites. Missing atlas uses existing art.
+ // Fully assembled house sprites avoid transparent atlas seams and duplicate doors.
+ // Draw exactly one PNG per house; original procedural sprites remain as fallback.
  if(o.spr.assetKey==='buildings/house'){
-  const sheet=asset('environment/buildings/szadi_houses',null);
-  if(sheet&&sheet.width===1024&&sheet.height===1024){
-   const style={
-    '6,6':2,     // player home - terracotta roof
-    '26,4':1,    // research centre - slate blue roof
-    '5,18':0,    // healing house - violet roof
-    '12,6':1,    // neighbour
-    '33,19':2    // neighbour
-   }[o.x+','+o.y];
-   if(style!==undefined){
-    const sourceX=[79,399,739][style],dw=o.spr.width,dh=o.spr.height;
-    const roofH=Math.round(dh*.62),wallY=y+roofH-10,wallH=dh-roofH+10;
-    ctx.imageSmoothingEnabled=false;
-    // Wall section, with timber frames and four intact windows.
-    ctx.drawImage(sheet,sourceX,663,170,73,x,wallY,dw,wallH);
-    // Roof overlaps wall by 10px, eliminating the transparent seam.
-    ctx.drawImage(sheet,sourceX,440,170,217,x,y,dw,roofH);
-    // A separate functional door centered at ground level. Always visible
-    // and contained within the original building footprint.
-    const doorW=Math.max(12,Math.round(dw*.14)),doorH=Math.max(22,Math.round(wallH*.65));
-    const dx=Math.round(x+(dw-doorW)/2),dy=Math.round(y+dh-doorH);
-    ctx.fillStyle='#4d3329';ctx.fillRect(dx-2,dy-2,doorW+4,doorH+2);
-    ctx.fillStyle='#895737';ctx.fillRect(dx,dy,doorW,doorH);
-    ctx.fillStyle='#d8b879';ctx.fillRect(dx+doorW-5,dy+Math.round(doorH*.55),2,2);
+  const houseName={
+   '6,6':'home',
+   '26,4':'research',
+   '5,18':'healing',
+   '12,6':'neighbor_a',
+   '33,19':'neighbor_b'
+  }[o.x+','+o.y];
+  if(houseName){
+   const picture=asset('environment/buildings/finished/'+houseName,null);
+   if(picture){
+    ctx.drawImage(picture,x,y,o.spr.width,o.spr.height);
     return;
    }
   }
