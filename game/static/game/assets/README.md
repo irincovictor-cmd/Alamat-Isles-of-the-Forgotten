@@ -33,12 +33,12 @@ Each atlas contains 15 tree sprites arranged in a 4×4 grid of 128×128 cells; t
 
 **Academic asset permission:** The creator of this tree pack granted academic-use permission to the project owner. This repository intentionally does not include the licensed tree PNGs: obtain them from the creator and place them at the paths above. Redistribution in a public source repository requires separately confirmed permission. Source: https://last-tick.itch.io/2d-forest-free-128x128.
 
-## The Quiet Village Pack — buildings
+## Szadi Art Houses Pack — current building replacement
 
-To replace the current code-drawn village buildings, place the original `Buildings.png` atlas at:
+Place `game/static/game/assets/environment/buildings/szadi_houses.png` (the original 1024×1024 `houses.png` atlas) in your local project. The game assembles roofs and walls into complete building facades, with variants for the player home, research center, healing house, and neighbors. Collisions, map footprints, and interactions remain unchanged. Missing atlas files fall back to the original procedural buildings.
 
-`game/static/game/assets/environment/buildings/quiet_village.png`
+Installation package: `Alamat_Szadi_Houses_Local.zip` in the private Google Drive folder **Alamat Game Assets**. Unzip it at the project root (`C:\\Users\\vtemp\\alamat`) and merge the `game` directory.
 
-The game uses the original 1227×1067 RGBA atlas directly; no manual sprite cutting is required. The five existing village houses receive different roof colors/variants. Building interaction markers and collision remain as before. The atlas is an optional visual override, and the procedural houses remain available when it is missing.
+Art by Szadi Art: https://szadiart.itch.io/houses-pack. The included license permits personal/commercial use and modifications without mandatory credit; reselling the asset pack is not permitted. The prior Quiet Village atlas is no longer referenced by the current building renderer and can be archived or removed locally after verifying the replacement.
 
-Original pack: *The Quiet Village Pack*, Pixelscape Studio. The included README permits personal and commercial game use and modifications and says credit is appreciated. It prohibits reselling/redistributing original or modified assets as standalone files. Keep the PNG in your local project rather than publishing it as an independently downloadable raw asset pack. The building visuals are still undergoing in-game scale testing.
+Note: Building proportions and appearance still need verification in the running browser, as the game uses different map-sized building footprints.
