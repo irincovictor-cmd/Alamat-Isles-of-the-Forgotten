@@ -1,6 +1,43 @@
 {
   "description": "Asset attribution record. Add one entry per downloaded asset or pack.",
-  "assets": [],
+  "assets": [
+    {
+      "path": "characters/player.png",
+      "source_pack": "3 Direction NPC Characters (Male4.png)",
+      "creator": "Szadi Art",
+      "source_url": "https://szadiart.itch.io/3-direction-npc-characters",
+      "license": "Creator license: game use and modification permitted; no standalone asset resale",
+      "changes": "Converted 32x48 cells into 4-direction, 4-walking-frame sprite sheet; opposite side mirrored",
+      "attribution_required": false
+    },
+    {
+      "path": "characters/luz.png",
+      "source_pack": "3 Direction NPC Characters",
+      "creator": "Szadi Art",
+      "source_url": "https://szadiart.itch.io/3-direction-npc-characters",
+      "license": "Creator license: game use and modification permitted; no standalone asset resale",
+      "changes": "Converted animation to Alamat's 256x256 actor sheet; original source filename assignment may differ",
+      "attribution_required": false
+    },
+    {
+      "path": "characters/dina.png",
+      "source_pack": "3 Direction NPC Characters",
+      "creator": "Szadi Art",
+      "source_url": "https://szadiart.itch.io/3-direction-npc-characters",
+      "license": "Creator license: game use and modification permitted; no standalone asset resale",
+      "changes": "Converted animation to Alamat's 256x256 actor sheet; original source filename assignment may differ",
+      "attribution_required": false
+    },
+    {
+      "path": "characters/tonyo.png",
+      "source_pack": "3 Direction NPC Characters",
+      "creator": "Szadi Art",
+      "source_url": "https://szadiart.itch.io/3-direction-npc-characters",
+      "license": "Creator license: game use and modification permitted; no standalone asset resale",
+      "changes": "Converted animation to Alamat's 256x256 actor sheet; original source filename assignment may differ",
+      "attribution_required": false
+    }
+  ],
   "entry_example": {
     "path": "creatures/example.png",
     "creator": "Artist name",
