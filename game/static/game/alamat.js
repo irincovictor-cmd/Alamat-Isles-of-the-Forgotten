@@ -468,6 +468,7 @@ function tickFade(){
 async function openParty(){if(!S.party.length){S.msg={t:'No party yet. Talk to Ate Luz.',ttl:100};return}
  S.busy=true;PARTY={sel:0,mode:'list'};
  for(;;){const a=await nextKey();
+  if(a==='menu-switch'||!PARTY)return;
   if(PARTY.mode==='list'){if(a==='up'||a==='left')PARTY.sel=(PARTY.sel+S.party.length-1)%S.party.length;
    else if(a==='down'||a==='right')PARTY.sel=(PARTY.sel+1)%S.party.length;
    else if(a==='ok'){PARTY.mode='act';PARTY.actSel=0}
@@ -627,7 +628,7 @@ function drawStorage(){
 }
 /* ---------- Creature Dex and matchup guide ---------- */
 function openDex(tab='dex'){
- if(S.mode!=='world'||S.busy||S.p.mv)return;
+ if(S.mode!=='world'||S.busy||S.p.mv||PARTY||STORAGE)return;
  DEX={tab,sel:0};
 }
 function dexInput(a){
@@ -726,8 +727,31 @@ function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
 /* ---------- input ---------- */
 function unstick(){S.fade=0;fadeTarget=null;S.loading=null;
  if(B){notify('In a battle: use the menu (Run to flee).',100);return}
- S.busy=false;S._warping=false;waiter=null;PARTY=null;DG=null;U=null;if(S.mode==='battle')S.mode='world';notify('View reset',90)}
-function dispatch(a){if(STORAGE){storageInput(a);return}if(DEX){dexInput(a);return}if(waiter){const w=waiter;waiter=null;w(a);return}
+ S.busy=false;S._warping=false;const w=PARTY&&waiter;waiter=null;PARTY=null;DEX=null;STORAGE=null;if(w)w('menu-switch');DG=null;U=null;if(S.mode==='battle')S.mode='world';notify('View reset',90)}
+// A single menu controller prevents multiple overlays from remaining active.
+// Never steal a key from battle/dialogue waiters: only the Party waiter is cancelled.
+function switchMenu(kind){
+ if(S.mode!=='world'||S.p.mv)return;
+ if(S.busy&&!PARTY)return;
+ const current=STORAGE?'storage':DEX?(DEX.tab==='guide'?'guide':'dex'):PARTY?'party':null;
+ if(current===kind){if(PARTY){const w=waiter;PARTY=null;S.busy=false;if(w){waiter=null;w('menu-switch')}}else{DEX=null;STORAGE=null}return}
+ if(PARTY){
+  const w=waiter;PARTY=null;S.busy=false;
+  if(w){waiter=null;w('menu-switch')}
+ }
+ DEX=null;STORAGE=null;
+ if(kind==='party')openParty();
+ else if(kind==='storage')openStorage();
+ else if(kind==='dex'||kind==='guide')openDex(kind);
+}
+function dispatch(a){
+ if(['party','storage','dex','guide'].includes(a)&&
+    S.mode==='world'&&(STORAGE||DEX||PARTY||(!S.busy&&!waiter))){
+  switchMenu(a);return
+ }
+ if(STORAGE){storageInput(a);return}
+ if(DEX){dexInput(a);return}
+ if(waiter){const w=waiter;waiter=null;w(a);return}
  if(S.mode==='title'){if(cloud.state==='loading')return;
   if(a==='ok'){if(canContinue())loadGame(true).then(ok=>{if(!ok)startNew()});else startNew();return}
   if(a==='new'&&canContinue()&&confirm('Start a new game? Your saved progress is replaced the next time the game saves.'))startNew();
@@ -746,10 +770,10 @@ addEventListener('keyup',e=>{const a=KM[e.key.length>1?e.key:e.key.toLowerCase()
 document.querySelectorAll('#pad button').forEach(b=>{const a=b.dataset.a;b.addEventListener('pointerdown',e=>{e.preventDefault();kd(a)});for(const ev of['pointerup','pointerleave','pointercancel'])b.addEventListener(ev,()=>ku(a))});
 cv.addEventListener('pointerdown',()=>{if(S.mode==='title')dispatch('ok')});
 $('btn-reset').addEventListener('click',()=>unstick());
-$('btn-party').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)openParty()});
-$('btn-dex').addEventListener('click',()=>{if(DEX)DEX=null;else openDex('dex')});
-$('btn-storage').addEventListener('click',()=>{if(STORAGE)STORAGE=null;else openStorage()});
-$('btn-guide').addEventListener('click',()=>{if(DEX)DEX.tab='guide';else openDex('guide')});
+$('btn-party').addEventListener('click',()=>switchMenu('party'));
+$('btn-dex').addEventListener('click',()=>switchMenu('dex'));
+$('btn-storage').addEventListener('click',()=>switchMenu('storage'));
+$('btn-guide').addEventListener('click',()=>switchMenu('guide'));
 $('btn-save').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)saveGame(true)});
 $('btn-load').addEventListener('click',()=>{if(S.mode==='title'||(S.mode==='world'&&!S.busy))loadGame(false)});
 $('btn-new').addEventListener('click',()=>{if((S.mode==='title'||(S.mode==='world'&&!S.busy&&!S.p.mv))&&confirm('Start a new game? Your saved progress is replaced the next time the game saves.')){startNew();notify('New game started.')}});
@@ -773,6 +797,7 @@ if(CFG.canTestRoster)$('btn-admin-roster').addEventListener('click',seedAdminRos
 /* ---------- self-tests ---------- */
 const TESTS=[
  ['Reserve capacity and starting state',()=>LIM.max_storage===30&&Array.isArray(S.storage)],
+ ['Menu switching uses one controller',()=>typeof switchMenu==='function'&&typeof storageInput==='function'&&typeof dexInput==='function'],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
  ['Houses and water block movement',()=>!canWalk(V,8,7)&&!canWalk(V,5,28)],
  ['Plaza path is walkable',()=>canWalk(V,19,17)],
