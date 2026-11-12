@@ -174,9 +174,61 @@ const newMap=(name,w,h,b)=>({name,w,h,g:new Uint8Array(w*h).fill(b),sol:new Uint
 const fill=(m,id,x,y,w,h)=>{for(let j=y;j<y+h;j++)for(let i=x;i<x+w;i++)if(i>=0&&j>=0&&i<m.w&&j<m.h)m.g[j*m.w+i]=id};
 function place(m,spr,x,y,w,h,ex){const o=Object.assign({x,y,w,h,spr,px:x*T+w*T/2-spr.width/2,py:(y+h)*T-spr.height,sy:(y+h)*T},ex||{});
  for(let j=0;j<h;j++)for(let i=0;i<w;i++)m.sol[(y+j)*m.w+x+i]=1;m.objs.push(o);return o}
-function bake(m){const[e,x]=mk(m.w*T,m.h*T);for(let j=0;j<m.h;j++)for(let i=0;i<m.w;i++){const id=m.g[j*m.w+i];x.drawImage(asset('tiles/'+TILE_NAMES[id],TL[id]),i*T,j*T,T,T);
- if(id===0&&rnd()<.06)R(x,i*T+rnd()*28,j*T+rnd()*28,3,3,[P.gold,P.off,'#E58BA5',P.violet][rnd()*4|0]);
- if(id===4&&tileAt(m,i,j-1)===3)R(x,i*T,j*T,T,3,'rgba(245,240,231,.7)')}m.gl=e}
+// Pocket Atlas Essentials, 8 columns of 32px cells. Optional local asset:
+ // game/static/game/assets/tiles/pocket_atlas.png (256x192)
+const TERRAIN_BASE={0:0,1:0,2:5,3:6,4:7,5:0,6:0};
+const TERRAIN_EDGE_START={2:9,3:21,4:33};
+function tileHash(x,y){return (Math.imul(x+1,73856093)^Math.imul(y+1,19349663))>>>0}
+function terrainCell(ctx,atlas,index,x,y){
+ ctx.drawImage(atlas,(index%8)*T,Math.floor(index/8)*T,T,T,x,y,T,T);
+}
+function terrainIndex(m,i,j,id){
+ if(![0,1,5,6].includes(id))return TERRAIN_BASE[id];
+ // Cardinal neighbors of foreign terrain: edges, then external corners.
+ // Each transition is a full 32x32 tile, never a transparent overlay.
+ for(const other of [2,3,4]){
+  const n=tileAt(m,i,j-1)===other,e=tileAt(m,i+1,j)===other;
+  const so=tileAt(m,i,j+1)===other,w=tileAt(m,i-1,j)===other;
+  const count=Number(n)+Number(e)+Number(so)+Number(w);
+  const start=TERRAIN_EDGE_START[other];
+  if(count===1)return start+(n?0:e?1:so?2:3);
+  if(count===2){
+   if(n&&e)return start+4; if(e&&so)return start+5;
+   if(so&&w)return start+6; if(w&&n)return start+7;
+  }
+ }
+ const h=tileHash(i,j)%16;
+ return id===0?(h===0?1:h===1?2:h===2?3:h===3?4:0):
+        id===5?(h%3===0?4:0):0;
+}
+function bake(m){
+ const[e,x]=mk(m.w*T,m.h*T);
+ const atlas=asset('tiles/pocket_atlas',null);
+ const hasAtlas=!!(atlas&&atlas.width===256&&atlas.height===192);
+ for(let j=0;j<m.h;j++)for(let i=0;i<m.w;i++){
+  const id=m.g[j*m.w+i],px=i*T,py=j*T;
+  if(hasAtlas){
+   terrainCell(x,atlas,terrainIndex(m,i,j,id),px,py);
+   // Forest and encounter terrain remain distinct. Darkening never changes collision.
+   if(id===1||id===6){
+    x.fillStyle=id===6?'rgba(18,52,37,.35)':'rgba(25,70,43,.15)';
+    x.fillRect(px,py,T,T);
+   }
+   if(id===5){
+    for(let k=0;k<7;k++){
+     const ox=(tileHash(i+k,j+k*3)%27)+2,oy=10+(tileHash(j+k,i+k*7)%18);
+     R(x,px+ox,py+oy,2,7,'#386d34');
+     R(x,px+ox+2,py+oy+2,1,4,'#63973a');
+    }
+   }
+  }else{
+   x.drawImage(asset('tiles/'+TILE_NAMES[id],TL[id]),px,py,T,T);
+   if(id===0&&rnd()<.06)R(x,px+rnd()*28,py+rnd()*28,3,3,[P.gold,P.off,'#E58BA5',P.violet][rnd()*4|0]);
+   if(id===4&&tileAt(m,i,j-1)===3)R(x,px,py,T,3,'rgba(245,240,231,.7)');
+  }
+ }
+ m.gl=e;
+}
 const npcAt=(m,x,y)=>m.npcs.find(n=>n.x===x&&n.y===y);
 const canWalk=(m,x,y)=>x>=0&&y>=0&&x<m.w&&y<m.h&&!m.sol[y*m.w+x]&&tileAt(m,x,y)!==4&&!npcAt(m,x,y);
 function scatter(m,spr,n,ok,ex){for(let i=0;i<n;i++){const x=1+rnd()*(m.w-2)|0,y=1+rnd()*(m.h-4)|0;if(ok(x,y)&&!m.sol[y*m.w+x])place(m,spr,x,y,1,1,Object.assign({tree:1},ex))}}
@@ -436,7 +488,7 @@ function update(dt){S.t+=dt;if(DG)DG.i=Math.min(DG.t.length,DG.i+dt/25);if(S.msg
 /* ---------- draw ---------- */
 function drawWorld(){const m=S.map,p=S.p,cx=Math.max(0,Math.min(m.w*T-W,Math.round(p.px+16-W/2))),cy=Math.max(0,Math.min(m.h*T-H,Math.round(p.py+16-H/2)));
  c.drawImage(m.gl,cx,cy,W,H,0,0,W,H);
- if((S.t/600|0)%2)for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(tileAt(m,i,j)===4&&i<m.w&&j<m.h)c.drawImage(asset('tiles/water',WA),i*T-cx,j*T-cy,T,T);
+ if(!images.get('tiles/pocket_atlas')?.ready&&(S.t/600|0)%2)for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(tileAt(m,i,j)===4&&i<m.w&&j<m.h)c.drawImage(asset('tiles/water',WA),i*T-cx,j*T-cy,T,T);
  const L=m.objs.map(o=>({sy:o.sy,fn:()=>drawObject(c,o,o.px-cx,o.py-cy)}));
  m.npcs.forEach(n=>L.push({sy:n.y*T+T,fn:()=>drawActor(c,n.pal,n.dir,0,n.x*T+16-32-cx,n.y*T+T-63-cy)}));
  L.push({sy:p.py+T,fn:()=>drawActor(c,PL,p.dir,p.f,Math.round(p.px+16-32-cx),Math.round(p.py+T-63-cy))});
