@@ -138,7 +138,6 @@ S_.fence=(()=>{const[e,x]=mk(32,32);R(x,2,12,4,18,P.wood);R(x,26,12,4,18,P.wood)
 S_.sign=(()=>{const[e,x]=mk(32,48);R(x,14,20,4,26,P.dk);R(x,4,8,24,16,P.bamb);R(x,4,8,24,3,P.wood);R(x,8,14,16,2,P.dk);R(x,8,18,12,2,P.dk);return e})();
 S_.stall=(()=>{const[e,x]=mk(128,96);R(x,0,52,128,40,P.bamb);R(x,0,52,128,4,P.wood);for(let i=0;i<8;i++)R(x,i*16,8,16,30,i%2?P.off:P.teal);R(x,0,38,128,4,'rgba(0,0,0,.25)');[[20,P.gold],[44,P.roof],[70,P.fern],[96,P.cyan]].forEach(([a,f])=>E(x,a,50,7,5,f));return e})();
 S_.palm=palm();S_.tree=tree(0);S_.btree=tree(1);
-S_.shrine=(()=>{const[e,x]=mk(96,96);E(x,48,90,28,4,'rgba(20,38,56,.35)');R(x,20,50,56,40,P.wood);R(x,24,54,48,32,'#C9B48A');R(x,42,70,12,20,P.dk);R(x,10,40,76,14,P.roof);R(x,18,30,60,12,P.roof);R(x,28,20,40,12,P.roof);R(x,38,10,20,12,P.gold);E(x,48,16,6,6,P.cyan);return e})();
 
 // Fixed filenames for environmental objects; generated art remains the fallback.
 for(const key of Object.keys(S_))S_[key].assetKey='objects/'+key;
@@ -324,7 +323,8 @@ function buildShrine(){const m=newMap('Ancient Shrine',16,12,6);
  fill(m,2,6,0,4,12);fill(m,5,2,4,4,4);fill(m,5,10,4,4,4);
  m.exits.push({x:7,y:11,to:'F',tx:14,ty:1,dir:0},{x:8,y:11,to:'F',tx:15,ty:1,dir:0});
  m.enc=DATA.encounters?.S||['alitaptap','dagat','bato','pakpak'];m.dark=1;
- place(m,S_.shrine,5,2,3,3,{nm:'Ancient Shrine',say:['Weathered stone. Faint light pulses from the altar. The Lilim’s influence is strong here… (Full shrine quest later.)'],at:[7,4]});
+ // The old procedural shrine hut has been retired. Its former tiles are clear
+ // until the approved shrine PNG is installed and placed in a later update.
  place(m,S_.btree,1,1,1,1,{tree:1});place(m,S_.btree,14,1,1,1,{tree:1});
  place(m,S_.btree,1,8,1,1,{tree:1});place(m,S_.btree,14,8,1,1,{tree:1});
  m.exits.forEach(e=>{m.sol[e.y*m.w+e.x]=0});
@@ -882,6 +882,7 @@ const TESTS=[
  ['NPC found on facing tile',()=>!!npcAt(V,21,14)],
  ['Forest has encounter grass and exits',()=>F.g.includes(5)&&F.exits.length>=2],
  ['Shrine map exists and links',()=>SH.w===16&&SH.exits.length>=1],
+ ['Old procedural shrine removed without blocking its tiles',()=>!SH.objs.some(o=>o.nm==='Ancient Shrine')&&canWalk(SH,6,3)&&SH.exits.length>=1],
  ['Creatures have required stats',()=>['tarsilaw','bato','dagat'].every(id=>SP[id]&&SP[id].hp>0)],
  ['mkC produces valid party member',()=>{const c=mkC('tarsilaw',5);return c.hp===c.max&&c.mv.length>=3&&c.lv===5}],
  ['Type chart returns multipliers',()=>typeMult('Fire','Nature')>1&&typeMult('Water','Fire')>1],
