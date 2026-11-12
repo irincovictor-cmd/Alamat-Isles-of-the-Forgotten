@@ -75,6 +75,8 @@ def play(request):
         'game_data': rules.client_data(),
         'game_config': {
             'saveUrl': reverse('api-save'),
+            'canTestRoster': bool(settings.DEBUG and (request.user.is_staff or request.user.is_superuser)),
+            'seedRosterUrl': reverse('api-seed-roster'),
             'loginUrl': reverse('login'),
             'username': request.user.get_username(),
         },
