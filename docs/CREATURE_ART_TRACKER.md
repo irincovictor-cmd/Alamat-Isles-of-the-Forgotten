@@ -20,7 +20,7 @@
 | 002 | Agilunos | Gale (Wind) | **Yes** | **Yes** | **Yes** | No | **Shared UI loader fixed; verify in game** | **Battle ready — in progress** |
 | 003 | Bagaon | Flame (Fire) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 004 | Alitaptap | Spark | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
-| 005 | Lumot | Bloom (Nature) | No | No | No | No | Placeholder | Not started |
+| 005 | Lumot | Bloom (Nature) | **Yes** | **Yes** | **Yes** | No | **Loader ready; verify in game** | **Battle ready — in progress** |
 | 006 | Pakpak | Shadow | No | No | No | No | Placeholder | Not started |
 | 007 | Bato | Stone (Earth) | No | No | No | No | Placeholder | Not started |
 | 008 | Dagat | Tide (Water) | No | No | No | No | Placeholder | Not started |
@@ -32,9 +32,18 @@
 | 014 | Habagat | Gale (Wind) | No | No | No | No | Placeholder | Not started |
 | 015 | Liyaban | Flame (Fire) | No | No | No | No | Placeholder | Not started |
 
-**Current counts:** 4 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon and Alitaptap); 0 of 15 are verified fully complete across all views. **11 creatures remain without prepared designs.**
+**Current counts:** 5 of 15 species have battle art prepared (Tarsilaw, Agilunos, Bagaon, Alitaptap and Lumot); 0 of 15 are verified fully complete across all views. **10 creatures remain without prepared designs.**
 
 ## Approved art notes
+
+### #005 Lumot
+
+- **Reference:** user-provided `lumot.png`, 256×256 transparent 4×4 pose sheet (64×64 cells).
+- **Design:** moss-green forest creature with large amber eyes, leafy branch-like horns, rounded belly, curled moss-covered tail.
+- **Chosen front/menu:** row 1, column 1. **Battle back:** row 4, column 2 (rear view).
+- **Package:** [Alamat_Lumot_Battle_Assets.zip](https://drive.google.com/file/d/1qw6RDDWRkhUbjZIgUGkLiG95yjVpIvZN/view) in Google Drive's `Alamat Game Assets`.
+- **Expected paths:** `game/static/game/assets/creatures/lumot/battle/front.png`, `battle/back.png`, and `menu.png`.
+- **Pending:** installation, visual confirmation, overworld art. Do not regenerate unless the user requests redesign.
 
 ### #004 Alitaptap
 
