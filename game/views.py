@@ -1,6 +1,7 @@
 """JSON API: health, token auth (for non-browser clients) and cloud save."""
 from django.contrib.auth import authenticate, get_user_model
 from django.db import transaction
+from django.conf import settings
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 
 from . import accounts
 from .models import PlayerSave
-from .rules import SaveError, sanitize_save
+from .rules import SaveError, sanitize_save, make_creature, DATA
 from .serializers import LoginSerializer, RegisterSerializer
 
 User = get_user_model()
@@ -116,3 +117,38 @@ def save_view(request):
         save.revision += 1
         save.save(update_fields=['data', 'revision', 'updated_at'])
         return _save_response(save, clean, adjusted)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def seed_test_roster(request):
+    """Local development only. Give staff their own complete test collection."""
+    if not settings.DEBUG or not (request.user.is_staff or request.user.is_superuser):
+        return Response({'detail': 'Staff-only development tool.'},
+                        status=status.HTTP_403_FORBIDDEN)
+    with transaction.atomic():
+        save, _ = PlayerSave.objects.select_for_update().get_or_create(
+            user=request.user, defaults={'data': {}})
+        rev = request.data.get('revision') if isinstance(request.data, dict) else None
+        if type(rev) is not int or rev != save.revision:
+            return Response({'detail': 'Save changed. Load the latest save and retry.'},
+                            status=status.HTTP_409_CONFLICT)
+        try:
+            original, _ = sanitize_save(save.data)
+        except SaveError:
+            original = {}
+        data = dict(original)
+        roster = [make_creature(sid, DATA['limits']['starter_level'])
+                  for sid in DATA['dex_order']]
+        data['party'] = roster[:DATA['limits']['max_party']]
+        data['storage'] = roster[DATA['limits']['max_party']:]
+        data['dex'] = list(DATA['dex_order'])
+        flags = dict(data.get('f', {}))
+        flags['starter'] = True
+        flags['bonded'] = True
+        data['f'] = flags
+        data, adjusted = sanitize_save(data)
+        save.data = data
+        save.revision += 1
+        save.save(update_fields=['data', 'revision', 'updated_at'])
+        return _save_response(save, data, adjusted)
