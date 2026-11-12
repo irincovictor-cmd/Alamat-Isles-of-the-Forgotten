@@ -8,6 +8,8 @@
 <div id="bar">
   <button type="button" id="btn-reset" title="Clear a stuck screen (F3)">Reset view</button>
   <button type="button" id="btn-party" title="Open party (P)">Party</button>
+  <button type="button" id="btn-dex" title="Open creature Dex (K)">Dex</button>
+  <button type="button" id="btn-guide" title="Open attribute guide (G)">Guide</button>
   <button type="button" id="btn-save" title="Save to your account (F5)">Save</button>
   <button type="button" id="btn-load" title="Load from your account (F9)">Load</button>
   <button type="button" id="btn-new" title="Start a new game (N on the title screen)">New game</button>
@@ -16,7 +18,7 @@
 </div>
 <div id="pad"><div class="dp"><button data-a="up">▲</button><button data-a="left">◀</button><button data-a="down">▼</button><button data-a="right">▶</button></div><div class="ab"><button data-a="back">B</button><button data-a="ok">A</button></div></div>
 <p id="status" role="status" aria-live="polite"></p>
-<p id="foot">Arrows/WASD · E interact · P party · F5 save · F9 load · F3 reset view</p>
+<p id="foot">Arrows/WASD · E interact · P party · K Dex · G guide · F5 save · F9 load</p>
 {{ game_data|json_script:"alamat-data" }}
 {{ game_config|json_script:"alamat-config" }}
 <script src="{% static 'game/alamat.js' %}"></script>
