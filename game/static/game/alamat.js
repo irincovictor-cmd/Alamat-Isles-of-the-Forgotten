@@ -320,8 +320,8 @@ sd=(Date.now()^Math.floor(Math.random()*4294967296))|0; /* world generation stay
 
 /* ---------- state ---------- */
 const S={mode:'title',map:V,mapId:'V',p:{x:19,y:17,px:19*T,py:17*T,tx:0,ty:0,dir:0,mv:0,f:0,ft:0},
- party:[],dex:[],selyo:3,herbs:2,f:{},busy:false,fade:0,t:0,insp:false,msg:null};
-let DG=null,U=null,B=null,PARTY=null,DEX=null;const held={up:0,down:0,left:0,right:0};
+ party:[],storage:[],dex:[],selyo:3,herbs:2,f:{},busy:false,fade:0,t:0,insp:false,msg:null};
+let DG=null,U=null,B=null,PARTY=null,DEX=null,STORAGE=null;const held={up:0,down:0,left:0,right:0};
 const TALK={};
 const tx=(s,x,y,col,sz,al)=>{c.font='bold '+(sz||18)+'px "Trebuchet MS",system-ui,sans-serif';c.fillStyle=col||P.navy;c.textAlign=al||'left';c.textBaseline='alphabetic';c.fillText(s,x,y)};
 const box=(x,y,w,h)=>{c.fillStyle='rgba(245,240,231,.97)';c.fillRect(x,y,w,h);c.strokeStyle=P.navy;c.lineWidth=3;c.strokeRect(x+1.5,y+1.5,w-3,h-3);c.strokeStyle=P.teal;c.lineWidth=2;c.strokeRect(x+6,y+6,w-12,h-12)};
@@ -344,10 +344,10 @@ async function api(method,body){
  if(r.status===409){const e=new Error('conflict');e.conflict=true;e.body=j;throw e}
  if(!r.ok){const e=new Error((j&&j.detail)||('HTTP '+r.status));e.body=j;throw e}
  return j}
-const snapshot=()=>JSON.parse(JSON.stringify({party:S.party,dex:S.dex,selyo:S.selyo,herbs:S.herbs,f:S.f,mapId:S.mapId,x:S.p.x,y:S.p.y,dir:S.p.dir}));
+const snapshot=()=>JSON.parse(JSON.stringify({party:S.party,storage:S.storage,dex:S.dex,selyo:S.selyo,herbs:S.herbs,f:S.f,mapId:S.mapId,x:S.p.x,y:S.p.y,dir:S.p.dir}));
 const hasLocal=()=>{try{return !!localStorage.getItem(LOCAL_KEY)}catch(e){return false}};
 const canContinue=()=>cloud.has||(cloud.state==='offline'&&hasLocal());
-function applySave(d){S.party=d.party||[];S.dex=DEX_ORDER.filter(id=>(d.dex||[]).includes(id)||S.party.some(c=>c.id===id));DEX=null;S.selyo=d.selyo??3;S.herbs=d.herbs??2;S.f=d.f||{};
+function applySave(d){S.party=d.party||[];S.storage=d.storage||[];S.dex=DEX_ORDER.filter(id=>(d.dex||[]).includes(id)||S.party.some(c=>c.id===id)||S.storage.some(c=>c.id===id));DEX=null;STORAGE=null;S.selyo=d.selyo??3;S.herbs=d.herbs??2;S.f=d.f||{};
  const mid=MAPS[d.mapId]?d.mapId:'V';S.mapId=mid;S.map=MAPS[mid];S.p.x=d.x??19;S.p.y=d.y??17;S.p.dir=d.dir??0;
  S.p.px=S.p.x*T;S.p.py=S.p.y*T;S.p.mv=0;S.mode='world';S.fade=0;fadeTarget=null;S.loading=null;S.safe=4}
 function startNew(){applySave({});S.msg=null}
@@ -428,14 +428,14 @@ async function battle(fid){S.busy=true;await fade(1);S.mode='battle';
    /* faster foe goes first; if it KOs your lead, the forced swap uses up your turn (no move from the wrong creature) */
    if(foe.spd>B.me.spd){await foeTurn();if(!res&&B.me===lead)await playerTurn()}
    else{await playerTurn();if(!res)await foeTurn()}}
-  else if(a===1){if(S.selyo<=0){await say('You have no Selyo left!');continue}
+  else if(a===1){if(S.party.length>=LIM.max_party&&S.storage.length>=LIM.max_storage){await say('Your Party and Storage are full! Make room first.');continue}if(S.selyo<=0){await say('You have no Selyo left!');continue}
    S.selyo--;await say('You offer a Selyo to '+foe.n+'…');
    const hpFactor=(1-foe.hp/foe.max)*0.55;const trustFactor=B.trust*0.09;const ch=Math.min(.92,Math.max(.06,.18+hpFactor+trustFactor));
    if(rnd()<ch){await say('Bond formed! '+foe.n+' trusts you now.');S.f.bonded=true;
     const recruit=mkC(fid,foe.lv);recruit.hp=Math.max(1,Math.floor(foe.hp));recruit.dh=recruit.hp;
-    if(S.party.length<LIM.max_party){S.party.push(recruit);S.dex=DEX_ORDER.filter(x=>x===fid||S.dex.includes(x));await say(foe.n+' joined your party!')}
-    else{B.msg='Your party is full! Who makes room for '+foe.n+'?';const k=await menu(S.party.map(q=>'Swap '+q.n).concat(['Let it go']));
-     if(k>=0&&k<S.party.length){const out=S.party[k];S.party[k]=recruit;S.dex=DEX_ORDER.filter(x=>x===fid||S.dex.includes(x));await say(out.n+' returns to the wild. '+foe.n+' joined your party!')}else await say(foe.n+' returns to the wild.')}
+    if(S.party.length<LIM.max_party){S.party.push(recruit);await say(foe.n+' joined your party!')}
+    else if(S.storage.length<LIM.max_storage){S.storage.push(recruit);await say(foe.n+' was sent to Storage! ('+S.storage.length+'/'+LIM.max_storage+')')}
+    S.dex=DEX_ORDER.filter(x=>x===fid||S.dex.includes(x));
     res='bond';break}
    await say('The bond slipped away…');if(!await foeAtk())res='lose'}
   else if(a===2){/* items */const opts=[];if(S.herbs>0)opts.push('Herb (heal)');opts.push('Cancel');
@@ -515,7 +515,7 @@ async function interact(){const m=S.map,p=S.p,x=p.x+DIRV[p.dir][0],y=p.y+DIRV[p.
  if(o){S.busy=true;if(o.heal){S.party.forEach(q=>{q.hp=q.max;q.dh=q.max});await talk('',['You rest at home. Your party is fully healed.']);}
   else await talk(o.nm||'',o.say);S.busy=false}}
 function update(dt){S.t+=dt;if(DG)DG.i=Math.min(DG.t.length,DG.i+dt/25);if(S.msg){S.msg.ttl-=dt/16;if(S.msg.ttl<=0)S.msg=null}
- if(S.mode!=='world'||PARTY||DEX)return;const p=S.p;
+ if(S.mode!=='world'||PARTY||DEX||STORAGE)return;const p=S.p;
  if(p.mv){p.mv+=dt/170;if(p.mv>=1){p.mv=0;p.x=p.tx;p.y=p.ty;p.px=p.x*T;p.py=p.y*T;arrive()}else{p.px=(p.x+(p.tx-p.x)*p.mv)*T;p.py=(p.y+(p.ty-p.y)*p.mv)*T;p.ft+=dt;p.f=((p.ft/110)|0)%4}return}
  p.f=0;if(S.busy)return;for(const d of['up','down','left','right'])if(held[d]){tryMove(d);break}}
 
@@ -566,6 +566,65 @@ function drawParty(){if(!PARTY)return;c.fillStyle='rgba(20,38,56,.88)';c.fillRec
   tx('ATK '+cr.atk+'  DEF '+cr.def+'  SPD '+cr.spd,W/2,308,P.navy,15,'center');
   tx('Moves: '+cr.mv.join(', '),W/2,340,P.navy,14,'center');tx('Enter / Esc to close',W/2,370,P.roof,13,'center')}
  tx('Selyo ×'+S.selyo+'   Herbs ×'+S.herbs+'   ·  Esc to close',W/2,450,P.off,14,'center')}
+/* ---------- reserve storage: three active creatures + thirty reserves ---------- */
+function openStorage(){
+ if(S.mode!=='world'||S.busy||S.p.mv||DEX||PARTY)return;
+ STORAGE={tab:'reserve',sel:0,swap:false};
+}
+function storageInput(a){
+ if(a==='back'||a==='storage'){
+  if(STORAGE.swap){STORAGE.swap=false;return}
+  STORAGE=null;return
+ }
+ if(a==='left'||a==='right'){
+  STORAGE.tab=STORAGE.tab==='reserve'?'party':'reserve';STORAGE.sel=0;STORAGE.swap=false;return
+ }
+ const list=STORAGE.swap?S.party:STORAGE.tab==='reserve'?S.storage:S.party;
+ if(a==='up')STORAGE.sel=Math.max(0,STORAGE.sel-1);
+ if(a==='down')STORAGE.sel=Math.min(Math.max(0,list.length-1),STORAGE.sel+1);
+ if(a!=='ok'||!list.length)return;
+ if(STORAGE.swap){
+  const target=STORAGE.sel,reserve=STORAGE.pending;
+  if(reserve>=0&&reserve<S.storage.length&&target<S.party.length){
+   const old=S.party[target];S.party[target]=S.storage[reserve];S.storage[reserve]=old;
+   notify('Swapped '+S.party[target].n+' into Party.');
+   queueAutosave();
+  }
+  STORAGE.swap=false;STORAGE.tab='reserve';STORAGE.sel=Math.min(reserve,Math.max(0,S.storage.length-1));return;
+ }
+ if(STORAGE.tab==='reserve'){
+  const i=STORAGE.sel;
+  if(S.party.length<LIM.max_party){
+   const cr=S.storage.splice(i,1)[0];S.party.push(cr);
+   STORAGE.sel=Math.min(i,Math.max(0,S.storage.length-1));
+   notify(cr.n+' moved to Party.');queueAutosave();
+  }else{STORAGE.pending=i;STORAGE.swap=true;STORAGE.sel=0}
+ }else if(S.party.length>1&&S.storage.length<LIM.max_storage){
+  const i=STORAGE.sel,cr=S.party.splice(i,1)[0];S.storage.push(cr);
+  STORAGE.sel=Math.min(i,S.party.length-1);
+  notify(cr.n+' moved to Storage.');queueAutosave();
+ }else notify('Keep at least one active creature and check Storage capacity.');
+}
+function drawStorage(){
+ c.fillStyle='rgba(11,23,32,.96)';c.fillRect(0,0,W,H);
+ const swap=STORAGE.swap,tab=swap?'party':STORAGE.tab;
+ const list=tab==='reserve'?S.storage:S.party;
+ tx('CREATURE STORAGE',W/2,41,P.gold,27,'center');
+ tx('Party '+S.party.length+'/'+LIM.max_party+'   ·   Storage '+S.storage.length+'/'+LIM.max_storage,W/2,70,P.off,16,'center');
+ tx(swap?'Select party member to swap with':'◀ ▶ Switch Party / Storage',W/2,99,P.cyan,15,'center');
+ const pagesize=7,sel=Math.min(STORAGE.sel,Math.max(0,list.length-1)),page=Math.floor(sel/pagesize),start=page*pagesize;
+ tx((tab==='party'?'ACTIVE PARTY':'STORED CREATURES')+'   Page '+(page+1)+'/'+Math.max(1,Math.ceil(list.length/pagesize)),42,133,P.gold,16);
+ if(!list.length)tx('No creatures stored yet. Bond with wild creatures!',W/2,250,P.off,17,'center');
+ list.slice(start,start+pagesize).forEach((cr,i)=>{
+  const idx=start+i,y=144+i*39;
+  c.fillStyle=idx===sel?'#f1c66a':'#31515e';c.fillRect(36,y,568,36);
+  drawUiCreature(cr.id,44,y+2,32,32);
+  tx(cr.n+'  Lv'+cr.lv,89,y+23,idx===sel?P.navy:P.off,17);
+  tx(typeName(cr.t)+'    HP '+cr.hp+'/'+cr.max,370,y+23,idx===sel?P.navy:P.off,13);
+ });
+ tx(swap?'Enter: Swap  ·  Esc: Cancel':tab==='party'?'Enter: Store selected creature':'Enter: Move to Party or choose a swap',W/2,441,P.off,14,'center');
+ tx('Up/Down: Select   ·   Esc: Close',W/2,464,P.off,13,'center');
+}
 /* ---------- Creature Dex and matchup guide ---------- */
 function openDex(tab='dex'){
  if(S.mode!=='world'||S.busy||S.p.mv)return;
@@ -658,6 +717,7 @@ function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
   else{S.mode='world'}
   drawMsg();
   if(DEX)drawDex();
+  if(STORAGE)drawStorage();
   if(S.fade>0.01){c.fillStyle='rgba(20,38,56,'+Math.min(1,S.fade)+')';c.fillRect(0,0,W,H)}
   drawLoading();
  }catch(err){console.error('draw',err);c.fillStyle=P.navy;c.fillRect(0,0,W,H);tx('Draw error — use Reset view',W/2,H/2,P.off,16,'center');S.fade=0;fadeTarget=null}
@@ -667,14 +727,14 @@ function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
 function unstick(){S.fade=0;fadeTarget=null;S.loading=null;
  if(B){notify('In a battle: use the menu (Run to flee).',100);return}
  S.busy=false;S._warping=false;waiter=null;PARTY=null;DG=null;U=null;if(S.mode==='battle')S.mode='world';notify('View reset',90)}
-function dispatch(a){if(DEX){dexInput(a);return}if(waiter){const w=waiter;waiter=null;w(a);return}
+function dispatch(a){if(STORAGE){storageInput(a);return}if(DEX){dexInput(a);return}if(waiter){const w=waiter;waiter=null;w(a);return}
  if(S.mode==='title'){if(cloud.state==='loading')return;
   if(a==='ok'){if(canContinue())loadGame(true).then(ok=>{if(!ok)startNew()});else startNew();return}
   if(a==='new'&&canContinue()&&confirm('Start a new game? Your saved progress is replaced the next time the game saves.'))startNew();
   return}
- if(S.mode==='world'&&!S.busy&&!S.p.mv){if(a==='ok')interact();if(a==='party')openParty();if(a==='dex')openDex('dex');if(a==='guide')openDex('guide')}}
+ if(S.mode==='world'&&!S.busy&&!S.p.mv){if(a==='ok')interact();if(a==='party')openParty();if(a==='dex')openDex('dex');if(a==='guide')openDex('guide');if(a==='storage')openStorage()}}
 const KM={ArrowUp:'up',w:'up',ArrowDown:'down',s:'down',ArrowLeft:'left',a:'left',ArrowRight:'right',d:'right',
- Enter:'ok',' ':'ok',e:'ok',z:'ok',n:'new',Escape:'back',x:'back',Backspace:'back',p:'party',P:'party',k:'dex',g:'guide'};
+ Enter:'ok',' ':'ok',e:'ok',z:'ok',n:'new',Escape:'back',x:'back',Backspace:'back',p:'party',P:'party',k:'dex',g:'guide',b:'storage'};
 const kd=a=>{if(a in held)held[a]=1;dispatch(a)},ku=a=>{if(a in held)held[a]=0};
 addEventListener('keydown',e=>{
  if(e.key==='F2'){S.insp=!S.insp;e.preventDefault();return}
@@ -688,13 +748,31 @@ cv.addEventListener('pointerdown',()=>{if(S.mode==='title')dispatch('ok')});
 $('btn-reset').addEventListener('click',()=>unstick());
 $('btn-party').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)openParty()});
 $('btn-dex').addEventListener('click',()=>{if(DEX)DEX=null;else openDex('dex')});
+$('btn-storage').addEventListener('click',()=>{if(STORAGE)STORAGE=null;else openStorage()});
 $('btn-guide').addEventListener('click',()=>{if(DEX)DEX.tab='guide';else openDex('guide')});
 $('btn-save').addEventListener('click',()=>{if(S.mode==='world'&&!S.busy)saveGame(true)});
 $('btn-load').addEventListener('click',()=>{if(S.mode==='title'||(S.mode==='world'&&!S.busy))loadGame(false)});
 $('btn-new').addEventListener('click',()=>{if((S.mode==='title'||(S.mode==='world'&&!S.busy&&!S.p.mv))&&confirm('Start a new game? Your saved progress is replaced the next time the game saves.')){startNew();notify('New game started.')}});
 
+async function seedAdminRoster(){
+ if(!CFG.canTestRoster||S.mode!=='world'||S.busy||DEX||STORAGE||PARTY)return;
+ if(!confirm('Fill this admin account with all 15 creatures? This replaces its active party and storage but keeps your map progress.'))return;
+ try{
+  const j=await fetch(CFG.seedRosterUrl,{method:'POST',credentials:'same-origin',
+   headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRFToken':getCookie('csrftoken')},
+   body:JSON.stringify({revision:cloud.rev})});
+  const data=await j.json();
+  if(!j.ok){notify(data.detail||'Could not load test creatures.',200);return}
+  cloud.rev=data.revision;cloud.has=true;cloud.conflict=false;applySave(data.data);
+  try{localStorage.setItem(LOCAL_KEY,JSON.stringify(snapshot()))}catch(e){}
+  notify('Admin test collection ready: 3 active, 12 stored; all Dex entries unlocked.',240)
+ }catch(err){notify('Could not contact the development server.',200)}
+}
+if(CFG.canTestRoster)$('btn-admin-roster').addEventListener('click',seedAdminRoster);
+
 /* ---------- self-tests ---------- */
 const TESTS=[
+ ['Reserve capacity and starting state',()=>LIM.max_storage===30&&Array.isArray(S.storage)],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
  ['Houses and water block movement',()=>!canWalk(V,8,7)&&!canWalk(V,5,28)],
  ['Plaza path is walkable',()=>canWalk(V,19,17)],
