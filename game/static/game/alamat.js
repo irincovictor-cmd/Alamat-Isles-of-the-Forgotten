@@ -76,28 +76,17 @@ function drawObject(ctx,o,x,y){
    return;
   }
  }
- // Fully assembled building PNGs avoid transparent atlas seams and duplicate doors.
- // Explicit asset IDs support new buildings independently of their map coordinates.
+ // Approved village art only. Never show the old procedural wooden huts.
+ // A visible placeholder makes a missing local ZIP obvious rather than hiding it
+ // behind the outdated buildings or invisible collision boxes.
  if(o.buildingAsset){
   const picture=asset('environment/buildings/finished/'+o.buildingAsset,null);
   if(picture){ctx.drawImage(picture,x,y,o.spr.width,o.spr.height);return}
- }
- // Legacy buildings still resolve by map position until migrated to explicit asset IDs.
- if(o.spr.assetKey==='buildings/house'){
-  const houseName={
-   '6,6':'home',
-   '26,4':'research',
-   '5,18':'healing',
-   '12,6':'neighbor_a',
-   '33,19':'neighbor_b'
-  }[o.x+','+o.y];
-  if(houseName){
-   const picture=asset('environment/buildings/finished/'+houseName,null);
-   if(picture){
-    ctx.drawImage(picture,x,y,o.spr.width,o.spr.height);
-    return;
-   }
-  }
+  ctx.fillStyle='#334f4b';ctx.fillRect(x+4,y+o.spr.height-44,o.spr.width-8,40);
+  ctx.fillStyle='#f5f0e7';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+  ctx.fillText('Missing building art',x+o.spr.width/2,y+o.spr.height-25,o.spr.width-12);
+  ctx.fillText(o.buildingAsset,x+o.spr.width/2,y+o.spr.height-10,o.spr.width-12);
+  ctx.textAlign='left';return;
  }
  const key=o.spr.assetKey;
  const img=key?asset('environment/'+key,o.spr):o.spr;
@@ -276,9 +265,9 @@ function buildVillage(){const m=newMap('Lumina Village',40,30,0);
  for(let x=0;x<40;x++){const s=Math.round(22.5+Math.sin(x/3)*1.2);fill(m,3,x,s,1,2);fill(m,4,x,s+2,1,30-s-2)}
  fill(m,2,3,15,35,2);fill(m,2,19,0,2,23);fill(m,2,16,12,8,7);
  m.exits.push({x:19,y:0,to:'F',tx:14,ty:22,dir:1},{x:20,y:0,to:'F',tx:15,ty:22,dir:1});
- place(m,house(5,4,P.roof,P.bamb),6,6,5,4,{say:['Your modest coastal home. Rest here to fully heal your party.'],at:[8,9],heal:1});
- place(m,house(8,6,P.teal,'#C9B48A'),26,4,8,6,{nm:'Research Center',say:['Lumina Research Center. Guardians study the Lilim here. (Interior coming later.)'],at:[30,9]});
- place(m,house(6,5,'#2F7A5A','#D9C7A0'),5,18,6,5,{nm:'Healing House',say:['Herbs and rest. Speak with Nanay Dina outside.'],at:[8,22]});
+ place(m,house(5,4,P.roof,P.bamb),6,6,5,4,{buildingAsset:'home',say:['Your modest coastal home. Rest here to fully heal your party.'],at:[8,9],heal:1});
+ place(m,house(8,6,P.teal,'#C9B48A'),26,4,8,6,{buildingAsset:'research',nm:'Research Center',say:['Lumina Research Center. Guardians study the Lilim here. (Interior coming later.)'],at:[30,9]});
+ place(m,house(6,5,'#2F7A5A','#D9C7A0'),5,18,6,5,{buildingAsset:'healing',nm:'Healing House',say:['Herbs and rest. Speak with Nanay Dina outside.'],at:[8,22]});
  // Potion Shop: reuse the former market area; 192x160 art on a 6x4 footprint.
  // Entrance at (28,20) is accessible from the south, (28,21).
  place(m,house(6,4,P.roof,'#B98A74'),25,17,6,4,{
@@ -286,14 +275,30 @@ function buildVillage(){const m=newMap('Lumina Village',40,30,0);
   say:['Welcome to the Herb & Potion Shop! Healing remedies and supplies will be available in a future update.'],
   at:[28,20]
  });
-place(m,S_.well,18,13,1,1,{say:['A cool, clear well. The water glimmers faintly.']});
+ // New village buildings replace the retired stall and generic neighbor huts.
+ place(m,house(5,4,P.roof,P.bamb),12,6,5,4,{
+  buildingAsset:'general_shop',nm:'Selyo & General Supply Shop',
+  say:['Selyo, travel provisions, and other supplies will be sold here soon.'],
+  at:[14,9]
+ });
+ place(m,house(4,4,P.roof,P.bamb),33,17,4,4,{
+  buildingAsset:'supply_storage',nm:'Creature Storage House',
+  say:['Extra companions are kept safely in Storage. Open the Storage menu (B) to manage your creatures.'],
+  at:[35,20]
+ });
+ place(m,house(4,3,P.roof,P.bamb),33,10,4,3,{
+  buildingAsset:'forge',nm:'Village Workshop',
+  say:['A village workshop for tools and equipment. Crafting will be available in a later update.'],
+  at:[35,12]
+ });
+ place(m,S_.well,18,13,1,1,{say:['A cool, clear well. The water glimmers faintly.']});
  place(m,S_.lantern,17,12,1,1);place(m,S_.lantern,22,12,1,1);
  place(m,S_.sign,18,2,1,1,{nm:'Sign',say:['Balete Forest ↑ North. Wild creatures roam the tall grass.']});
  place(m,S_.sign,21,19,1,1,{nm:'Sign',say:['Lumina Village. Mind the tide.']});
- for(const x of[3,4,5,34,35,36])place(m,S_.fence,x,14,1,1);
- const ok=(x,y)=>[0,1].includes(tileAt(m,x,y))&&!(x>=15&&x<=24&&y>=11&&y<=19)&&!(y>=14&&y<=17)&&!(x>=18&&x<=21)&&!(x>=24&&x<=32&&y>=16&&y<=21);
- for(let x=3;x<38;x+=4)if(canWalk(m,x,21)&&tileAt(m,x,21)<4&&!(x>=18&&x<=21)&&!(x>=25&&x<=31))place(m,S_.palm,x,21,1,1,{tree:1});
- scatter(m,S_.tree,40,ok);scatter(m,S_.palm,14,ok);
+ for(const x of[3,4,5])place(m,S_.fence,x,14,1,1);
+ const ok=(x,y)=>[0,1].includes(tileAt(m,x,y))&&!(x>=15&&x<=24&&y>=11&&y<=19)&&!(y>=14&&y<=17)&&!(x>=18&&x<=21)&&!(x>=24&&x<=32&&y>=16&&y<=21)&&!(x>=10&&x<=18&&y>=5&&y<=11)&&!(x>=32&&x<=38&&y>=9&&y<=22);
+ // Coconut palm placements removed; use broadleaf forest trees only.
+ scatter(m,S_.tree,40,ok);
  for(let y=1;y<22;y+=3){if(ok(0,y)&&!m.sol[y*40])place(m,S_.tree,0,y,1,1,{tree:1});if(ok(39,y)&&!m.sol[y*40+39])place(m,S_.tree,39,y,1,1,{tree:1})}
  m.npcs.push({id:'luz',name:'Ate Luz',x:21,y:14,dir:2,pal:{id:'luz',top:P.off,trim:P.teal,pants:'#3B4A6B',boots:P.dk,hair:'#3A2A20'}},
   {id:'dina',name:'Nanay Dina',x:12,y:16,dir:0,pal:{id:'dina',top:'#B5573A',trim:P.gold,pants:'#6B5A4A',boots:P.dk,hair:'#9AA0A8'}},
@@ -860,6 +865,13 @@ const TESTS=[
  ['Menu switching uses one controller',()=>typeof switchMenu==='function'&&typeof storageInput==='function'&&typeof dexInput==='function'],
  ['Attribute badges and heart indicators exist',()=>Object.keys(ATTR_STYLE).length===8&&typeof badgeType==='function'&&typeof hpHeart==='function'],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
+ ['Rebuilt village uses PNG buildings without coconut palms or old stall',()=>{
+  const required=['home','research','healing','potion_shop','general_shop','supply_storage','forge'];
+  return required.every(key=>V.objs.some(o=>o.buildingAsset===key))
+   &&!V.objs.some(o=>o.spr===S_.palm||o.spr===S_.stall)
+   &&!V.objs.some(o=>o.spr.assetKey==='buildings/house'&&!o.buildingAsset)
+   &&canWalk(V,14,10)&&canWalk(V,35,21)&&canWalk(V,35,13);
+ }],
  ['Potion Shop has artwork key, collision and reachable entrance',()=>{
   const shop=V.objs.find(o=>o.buildingAsset==='potion_shop');
   return !!shop&&shop.w===6&&shop.h===4&&shop.at[0]===28&&shop.at[1]===20
