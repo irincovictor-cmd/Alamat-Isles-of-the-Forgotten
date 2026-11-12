@@ -25,6 +25,22 @@ Open <http://127.0.0.1:8000/>. Create an account at `/register/`, then play at `
 Progress autosaves to your account (after map changes and battles); **F5** saves, **F9** loads.
 Run the tests with `python manage.py test`.
 
+### Creating an administrator (for new installations)
+
+After `python manage.py migrate`, the person **running the server locally** can open a terminal in the project folder and run:
+
+```bash
+python manage.py setupadmin
+```
+
+Follow Django's interactive prompts to enter a **new, unique username and strong password**. Django hides the password while typing. The command creates a Django superuser, who can sign in to `/admin/` and the game at `/play/`. This setup command runs only from a local interactive terminal; there is **no public "register as admin" option**.
+
+If the username already exists as a regular player, choose a different username for the admin account. To change a current admin's password, run `python manage.py changepassword <username>`.
+
+**Security:** Giving out the source code does not share your personal admin account or database. Never commit `db.sqlite3`, `.env`, or your credentials; each installation must create its own admin. The optional **Load All Creatures** test tool is visible only to staff/superusers in development mode (`DJANGO_DEBUG=1`) and replaces that admin account's test collection.
+
+
+
 | Key | Action |
 |-----|--------|
 | Arrows / WASD | Move |
