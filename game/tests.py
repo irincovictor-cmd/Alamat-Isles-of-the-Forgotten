@@ -346,6 +346,17 @@ class LogoutAndPlayTests(CacheClearMixin, TestCase):
         self.client.login(username='ana', password=GOOD_PW)
         self.assertRedirects(self.client.get('/'), reverse('play'), fetch_redirect_response=False)
 
+    def test_admin_testing_button_is_staff_only(self):
+        self.client.login(username='ana', password=GOOD_PW)
+        with override_settings(DEBUG=True):
+            self.assertNotContains(self.client.get(reverse('play')), 'id="btn-admin-roster"')
+            user = User.objects.get(username='ana')
+            user.is_staff = True
+            user.save(update_fields=['is_staff'])
+            self.assertContains(self.client.get(reverse('play')), 'id="btn-admin-roster"')
+            with override_settings(DEBUG=False):
+                self.assertNotContains(self.client.get(reverse('play')), 'id="btn-admin-roster"')
+
     def test_logout_requires_post(self):
         self.client.login(username='ana', password=GOOD_PW)
         self.assertEqual(self.client.get(reverse('logout')).status_code, 405)
