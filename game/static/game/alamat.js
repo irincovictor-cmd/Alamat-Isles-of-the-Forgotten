@@ -327,6 +327,33 @@ const tx=(s,x,y,col,sz,al)=>{c.font='bold '+(sz||18)+'px "Trebuchet MS",system-u
 const box=(x,y,w,h)=>{c.fillStyle='rgba(245,240,231,.97)';c.fillRect(x,y,w,h);c.strokeStyle=P.navy;c.lineWidth=3;c.strokeRect(x+1.5,y+1.5,w-3,h-3);c.strokeStyle=P.teal;c.lineWidth=2;c.strokeRect(x+6,y+6,w-12,h-12)};
 const wrap=(s,w)=>{const o=[];let l='';for(const t of s.split(' ')){const q=l?l+' '+t:t;if(c.measureText(q).width>w&&l){o.push(l);l=t}else l=q}o.push(l);return o};
 const bar=(x,y,w,v)=>{c.fillStyle=P.navy;c.fillRect(x,y,w,10);c.fillStyle=v>.5?'#4E9A55':v>.2?P.gold:'#C8452B';c.fillRect(x+2,y+2,Math.max(0,(w-4)*v),6)};
+// Small pixel-art attribute emblems and heart. Text labels stay visible for accessibility.
+const ATTR_STYLE={
+ Fire:['#bc4b2e','#ffdc90'],Water:['#277da5','#b4ecff'],Earth:['#83664a','#e2c18c'],
+ Nature:['#4d8c57','#d4f2a6'],Wind:['#4c92a2','#d5f8ff'],Spark:['#a37b22','#fff4a0'],
+ Light:['#d2a53a','#fffbe0'],Shadow:['#67528b','#e7d2ff']
+};
+const attrGlyph={Fire:'♨',Water:'◆',Earth:'▲',Nature:'✿',Wind:'≋',Spark:'ϟ',Light:'✦',Shadow:'☾'};
+const badgeType=(t,x,y,size=19)=>{
+ const [bg,fg]=ATTR_STYLE[t]||['#667482','#ffffff'];
+ c.fillStyle=P.navy;c.fillRect(Math.round(x),Math.round(y),size,size);
+ c.fillStyle=bg;c.fillRect(Math.round(x)+2,Math.round(y)+2,size-4,size-4);
+ c.font='bold '+Math.round(size*.8)+'px sans-serif';
+ c.textAlign='center';c.textBaseline='middle';c.fillStyle=fg;
+ c.fillText(attrGlyph[t]||'?',x+size/2,y+size/2+1);
+ c.textBaseline='alphabetic';
+};
+function hpHeart(x,y,size=13){
+ const u=Math.max(1,Math.round(size/7));
+ const rows=['0110110','1111111','1111111','0111110','0011100','0001000'];
+ c.fillStyle='#c74342';
+ rows.forEach((row,j)=>{for(let i=0;i<7;i++)if(row[i]==='1')c.fillRect(Math.round(x)+i*u,Math.round(y)+j*u,u,u)});
+}
+function healthBar(x,y,w,hp,max,icon=true){
+ const start=x+(icon?23:0);
+ if(icon)hpHeart(x,y-1,14);
+ bar(start,y,w-(icon?23:0),Math.max(0,Math.min(1,hp/Math.max(1,max))));
+}
 const xpBar=(x,y,w,v)=>{c.fillStyle=P.navy;c.fillRect(x,y,w,6);c.fillStyle=P.teal;c.fillRect(x+1,y+1,Math.max(0,(w-2)*v),4)};
 
 /* ---------- save / load: Django is the source of truth ---------- */
@@ -535,7 +562,7 @@ function drawWorld(){const m=S.map,p=S.p,cx=Math.max(0,Math.min(m.w*T-W,Math.rou
 function drawPick(){if(!U)return;c.fillStyle='rgba(20,38,56,.82)';c.fillRect(0,0,W,H);tx('Choose your partner',W/2,52,P.gold,28,'center');
  U.ids.forEach((id,i)=>{const s=SP[id],x=26+i*204,sel=U.sel===i;c.fillStyle=sel?P.gold:P.off;c.fillRect(x-4,76-4,188,308);c.fillStyle=P.off;c.fillRect(x,76,180,300);c.fillStyle=P.navy;c.fillRect(x,76,180,28);tx(s.n,x+90,97,P.off,18,'center');
   c.fillStyle='rgba(118,216,210,.25)';c.fillRect(x+8,112,164,150);drawUiCreature(id,x+26,118+(sel?Math.sin(S.t/200)*3:0),128,128);
-  tx(s.t,x+90,286,P.teal,16,'center');tx('HP '+s.hp+'  ATK '+s.atk,x+90,312,P.navy,14,'center');tx('DEF '+s.def+'  SPD '+s.spd,x+90,334,P.navy,14,'center');tx(sel?'Press Enter':'',x+90,362,P.roof,14,'center')});
+  badgeType(s.t,x+39,269,21);tx(typeName(s.t),x+100,286,P.teal,16,'center');hpHeart(x+25,301,14);tx('HP '+s.hp+'  ATK '+s.atk,x+46,312,P.navy,14);tx('DEF '+s.def+'  SPD '+s.spd,x+90,334,P.navy,14,'center');tx(sel?'Press Enter':'',x+90,362,P.roof,14,'center')});
  tx('◀ ▶ to look · Enter to choose (original species)',W/2,430,P.off,15,'center')}
 function drawDlg(){if(!DG)return;box(16,372,608,96);if(DG.n){c.fillStyle=P.teal;c.fillRect(30,354,160,26);tx(DG.n,40,373,P.off,16)}
  c.font='bold 18px "Trebuchet MS",system-ui,sans-serif';let n=DG.i|0;wrap(DG.t,556).forEach((l,i)=>{tx(l.slice(0,Math.max(0,n)),32,408+i*26,P.navy,18);n-=l.length+1});
@@ -545,9 +572,9 @@ function drawBattle(){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'
  for(const q of[B.foe,B.me])q.dh+=(q.hp-q.dh)*.15;
  const bob=Math.sin(S.t/300)*3,sh=B.hit==='foe'&&((S.t/60|0)%2)?8:0,sm=B.hit==='me'&&((S.t/60|0)%2)?8:0;
  paintBattleCreature(c,B.foe.id,'front',390+sh,70+bob,160);paintBattleCreature(c,B.me.id,'back',70+sm,176-bob,192);
- box(24,24,270,64);tx(B.foe.n,40,52,P.navy,18);tx('Lv'+B.foe.lv,262,52,P.teal,14,'right');bar(40,62,236,B.foe.dh/B.foe.max);
- box(346,236,270,78);tx(B.me.n,362,260,P.navy,18);tx('Lv'+B.me.lv+' · '+B.me.t,598,260,P.teal,14,'right');bar(362,270,236,B.me.dh/B.me.max);
- tx('HP '+Math.ceil(B.me.dh)+'/'+B.me.max+'   Trust '+B.trust+'/5',362,296,P.navy,13);xpBar(362,304,160,B.me.xp/B.me.next);
+ box(24,24,270,64);tx(B.foe.n,40,52,P.navy,18);badgeType(B.foe.t,204,34,18);tx('Lv'+B.foe.lv,262,52,P.teal,14,'right');healthBar(40,62,236,B.foe.dh,B.foe.max);
+ box(346,236,270,78);tx(B.me.n,362,260,P.navy,18);badgeType(B.me.t,508,243,18);tx('Lv'+B.me.lv,598,260,P.teal,14,'right');healthBar(362,270,236,B.me.dh,B.me.max);
+ tx('HP '+Math.ceil(B.me.dh)+'/'+B.me.max+'   '+typeName(B.me.t)+'   Trust '+B.trust+'/5',362,296,P.navy,13);xpBar(362,304,160,B.me.xp/B.me.next);
  box(16,372,608,96);c.font='bold 18px "Trebuchet MS",system-ui,sans-serif';wrap(B.msg,B.ui?280:560).forEach((l,i)=>tx(l,32,408+i*26,P.navy,18));
  if(B.ui)B.ui.opts.forEach((o,i)=>{const x=340+(i%2)*140,y=388+((i/2)|0)*32;if(B.ui.sel===i){c.fillStyle=P.gold;c.fillRect(x-6,y-2,132,28)}tx(o,x,y+18,P.navy,16)})}
 function drawParty(){if(!PARTY)return;c.fillStyle='rgba(20,38,56,.88)';c.fillRect(0,0,W,H);
@@ -555,15 +582,15 @@ function drawParty(){if(!PARTY)return;c.fillStyle='rgba(20,38,56,.88)';c.fillRec
  S.party.forEach((cr,i)=>{const y=90+i*90,sel=PARTY.sel===i&&PARTY.mode!=='summary';
   if(sel){c.fillStyle='rgba(241,198,106,.35)';c.fillRect(60,y-8,520,82)}
   drawUiCreature(cr.id,70,y,64,64);
-  tx(cr.n+'  Lv'+cr.lv+'  '+cr.t,150,y+22,P.navy,18);bar(150,y+32,280,cr.hp/cr.max);
+  tx(cr.n+'  Lv'+cr.lv,150,y+22,P.navy,18);badgeType(cr.t,447,y+4,19);tx(typeName(cr.t),473,y+21,P.teal,14);healthBar(150,y+32,280,cr.hp,cr.max);
   tx('HP '+cr.hp+'/'+cr.max+'   ATK '+cr.atk+' DEF '+cr.def+' SPD '+cr.spd,150,y+58,P.navy,13);
   xpBar(150,y+66,200,cr.xp/cr.next)});
  if(PARTY.mode==='act'){const acts=['Summary','Use Herb','Close'];box(380,300,200,110);
   acts.forEach((a,i)=>{if(PARTY.actSel===i){c.fillStyle=P.gold;c.fillRect(396,318+i*28,168,26)}tx(a,410,338+i*28,P.navy,16)})}
  if(PARTY.mode==='summary'){const cr=S.party[PARTY.sel];box(120,80,400,300);tx(cr.n+' — Summary',W/2,112,P.navy,20,'center');
   drawUiCreature(cr.id,W/2-48,130,96,96);
-  tx('Level '+cr.lv+'  ·  '+cr.t,W/2,250,P.teal,16,'center');
-  tx('HP '+cr.hp+'/'+cr.max+'   XP '+cr.xp+'/'+cr.next,W/2,280,P.navy,15,'center');
+  badgeType(cr.t,237,233,20);tx('Level '+cr.lv+'  ·  '+typeName(cr.t),W/2+10,250,P.teal,16,'center');
+  hpHeart(182,264,14);tx('HP '+cr.hp+'/'+cr.max+'   XP '+cr.xp+'/'+cr.next,W/2+10,280,P.navy,15,'center');
   tx('ATK '+cr.atk+'  DEF '+cr.def+'  SPD '+cr.spd,W/2,308,P.navy,15,'center');
   tx('Moves: '+cr.mv.join(', '),W/2,340,P.navy,14,'center');tx('Enter / Esc to close',W/2,370,P.roof,13,'center')}
  tx('Selyo ×'+S.selyo+'   Herbs ×'+S.herbs+'   ·  Esc to close',W/2,450,P.off,14,'center')}
@@ -621,7 +648,7 @@ function drawStorage(){
   c.fillStyle=idx===sel?'#f1c66a':'#31515e';c.fillRect(36,y,568,36);
   drawUiCreature(cr.id,44,y+2,32,32);
   tx(cr.n+'  Lv'+cr.lv,89,y+23,idx===sel?P.navy:P.off,17);
-  tx(typeName(cr.t)+'    HP '+cr.hp+'/'+cr.max,370,y+23,idx===sel?P.navy:P.off,13);
+  badgeType(cr.t,352,y+8,18);hpHeart(388,y+11,11);tx(cr.hp+'/'+cr.max,415,y+23,idx===sel?P.navy:P.off,13);healthBar(500,y+13,92,cr.hp,cr.max,false);
  });
  tx(swap?'Enter: Swap  ·  Esc: Cancel':tab==='party'?'Enter: Store selected creature':'Enter: Move to Party or choose a swap',W/2,441,P.off,14,'center');
  tx('Up/Down: Select   ·   Esc: Close',W/2,464,P.off,13,'center');
@@ -653,7 +680,7 @@ function drawDex(){
   names.forEach((t,i)=>{
    const y=92+i*37;
    if(i%2===0){c.fillStyle='rgba(245,240,231,.09)';c.fillRect(22,y-18,596,35)}
-   tx(typeName(t),35,y+3,P.gold,16);
+   badgeType(t,35,y-15,19);tx(typeName(t),66,y+3,P.gold,16);
    tx('Counter: '+weakTo(t).map(typeName).join(' / '),205,y+3,P.off,14);
   });
   tx('Strength is based on the move attribute, not only the creature.',W/2,417,P.cyan,13,'center');
@@ -670,11 +697,11 @@ function drawDex(){
   c.save();if(!known)c.filter='brightness(0)';
   c.drawImage(img,0,0,img.width,img.height,x+32,y+3,48,48);c.restore();
   tx('#'+String(i+1).padStart(3,'0'),x+7,y+15,P.gold,10);
-  tx(known?SP[id].n:'???',x+56,y+67,P.off,12,'center');
+  tx(known?SP[id].n:'???',x+56,y+67,P.off,12,'center');if(known)badgeType(SP[id].t,x+90,y+6,16);
  });
  const id=DEX_ORDER[DEX.sel],known=S.dex.includes(id),type=SP[id].t;
  c.fillStyle='#f5f0e7';c.fillRect(20,358,600,82);
- tx(known?SP[id].n+' — '+typeName(type):'Unknown creature',32,382,P.navy,18);
+ tx(known?SP[id].n+' — '+typeName(type):'Unknown creature',32,382,P.navy,18);if(known)badgeType(type,575,364,22);
  if(known){
   tx('Strong vs '+winsAgainst(type).map(typeName).join(', '),32,402,P.teal,13);
   tx('Weak to '+weakTo(type).map(typeName).join(', '),32,419,P.roof,13);
@@ -798,6 +825,7 @@ if(CFG.canTestRoster)$('btn-admin-roster').addEventListener('click',seedAdminRos
 const TESTS=[
  ['Reserve capacity and starting state',()=>LIM.max_storage===30&&Array.isArray(S.storage)],
  ['Menu switching uses one controller',()=>typeof switchMenu==='function'&&typeof storageInput==='function'&&typeof dexInput==='function'],
+ ['Attribute badges and heart indicators exist',()=>Object.keys(ATTR_STYLE).length===8&&typeof badgeType==='function'&&typeof hpHeart==='function'],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
  ['Houses and water block movement',()=>!canWalk(V,8,7)&&!canWalk(V,5,28)],
  ['Plaza path is walkable',()=>canWalk(V,19,17)],
