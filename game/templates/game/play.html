@@ -1,0 +1,23 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ALAMAT: Isles of the Forgotten</title>
+<link rel="stylesheet" href="{% static 'game/alamat.css' %}">
+</head><body>
+<canvas id="g" role="img" aria-label="ALAMAT game canvas. Arrow keys or WASD to move, E or Space to interact, P for party."></canvas>
+<div id="bar">
+  <button type="button" id="btn-reset" title="Clear a stuck screen (F3)">Reset view</button>
+  <button type="button" id="btn-party" title="Open party (P)">Party</button>
+  <button type="button" id="btn-save" title="Save to your account (F5)">Save</button>
+  <button type="button" id="btn-load" title="Load from your account (F9)">Load</button>
+  <button type="button" id="btn-new" title="Start a new game (N on the title screen)">New game</button>
+  <span class="who">Signed in as <strong>{{ username }}</strong></span>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" id="btn-out">Log out</button></form>
+</div>
+<div id="pad"><div class="dp"><button data-a="up">▲</button><button data-a="left">◀</button><button data-a="down">▼</button><button data-a="right">▶</button></div><div class="ab"><button data-a="back">B</button><button data-a="ok">A</button></div></div>
+<p id="status" role="status" aria-live="polite"></p>
+<p id="foot">Arrows/WASD · E interact · P party · F5 save · F9 load · F3 reset view</p>
+{{ game_data|json_script:"alamat-data" }}
+{{ game_config|json_script:"alamat-config" }}
+<script src="{% static 'game/alamat.js' %}"></script>
+</body></html>

@@ -1,0 +1,17 @@
+{% extends "game/auth_base.html" %}
+{% block title %}Create account{% endblock %}
+{% block heading %}Create your account{% endblock %}
+{% block content %}
+<form method="post" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <div class="alert" role="alert">{% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}</div>
+  {% endif %}
+  <input type="hidden" name="next" value="{{ next }}">
+  {% include "game/_field.html" with field=form.username %}
+  {% include "game/_field.html" with field=form.password1 %}
+  {% include "game/_field.html" with field=form.password2 %}
+  <button type="submit" class="primary">Create account &amp; play</button>
+</form>
+<p class="alt">Already playing? <a href="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}">Sign in</a></p>
+{% endblock %}

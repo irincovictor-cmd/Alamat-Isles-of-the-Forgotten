@@ -1,0 +1,17 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}ALAMAT{% endblock %} · ALAMAT: Isles of the Forgotten</title>
+<link rel="stylesheet" href="{% static 'game/auth.css' %}">
+</head>
+<body>
+<main class="card">
+  <p class="brand">ALAMAT</p>
+  <p class="tag">Isles of the Forgotten</p>
+  <h1>{% block heading %}{% endblock %}</h1>
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

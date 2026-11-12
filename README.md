@@ -10,16 +10,20 @@ ALAMAT is an original creature-collecting RPG set across a fictional Philippine-
 
 > Important: Traditional figures keep their documented names (e.g. **Tikbalang**, **Bakunawa**, **Kapre**). Original game species must be identified as original creations. The Aswang Project is a research reference, **not an art-asset library or blanket permission to reproduce its text/images**.
 
-## Play now
+## Play now (Django is the main app)
 
-1. Open **`alamat-prototype.html`** in a browser (or use GitHub Pages once that file is the site root / `index.html`).
-2. No Python/Django required for local playtesting.
-3. **F5** save / **F9** load use browser localStorage.
+```bash
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+cp .env.example .env               # optional for local dev
+python manage.py migrate
+python manage.py runserver
+```
 
-Full session notes: **[PROGRESS.md](PROGRESS.md)**  
-Backend setup: **[README_BACKEND.md](README_BACKEND.md)**
-
-### Prototype controls
+Open <http://127.0.0.1:8000/>. Create an account at `/register/`, then play at `/play/`.
+Progress autosaves to your account (after map changes and battles); **F5** saves, **F9** loads.
+Run the tests with `python manage.py test`.
 
 | Key | Action |
 |-----|--------|
@@ -27,32 +31,24 @@ Backend setup: **[README_BACKEND.md](README_BACKEND.md)**
 | E / Space / Enter | Interact |
 | P | Party menu |
 | X / Esc | Back |
-| F5 | Save |
-| F9 | Load |
+| F5 / F9 | Save to / load from your account |
+| N (title screen) | New game |
+| F3 / Reset view | Clear a stuck overlay (not during a battle) |
 | F2 | Collision inspector |
+
+Pages: `/login/`, `/register/`, `/logout/` (POST), `/play/`. JSON API: `/api/` (see [README_BACKEND.md](README_BACKEND.md)).
+
+> `alamat-prototype.html` is the old standalone snapshot (offline, localStorage). It only received the
+> fade-freeze fix; new work happens in `game/static/game/alamat.js` + Django.
+
+Full session notes: **[PROGRESS.md](PROGRESS.md)**
 
 ### Vertical slice included
 
 - Lumina Village → Balete Forest → Ancient Shrine
 - Starter selection, wild encounters, turn-based battle
-- Trust + Selyo bonding, party (max 3), herbs, XP/levels
-- NPCs, dialogue, local save/load
-
-## Minimal Django API (optional)
-
-Auth + cloud save only. Not required to play the HTML prototype.
-
-```bash
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py runserver
-```
-
-- `GET /api/health/`
-- `POST /api/auth/register/` / `login/`
-- `GET|PUT /api/save/` (token auth)
+- Trust + Selyo bonding, party (max 3), herbs, XP/levels (cap 30)
+- NPCs, dialogue, account save/load
 
 ## Design docs (still authoritative for scope/lore)
 

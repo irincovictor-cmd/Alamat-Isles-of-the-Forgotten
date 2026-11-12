@@ -1,17 +1,9 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>ALAMAT loading</title></head>
-<body><p style="font-family:system-ui;padding:2rem">Loading ALAMAT…</p>
-<script src="ch0.js"></script>
-<script src="ch1.js"></script>
-<script src="ch2.js"></script>
-<script src="ch3.js"></script>
-<script src="ch4.js"></script>
-<script src="ch5.js"></script>
-<script>
-(function(){
-  var html = (window.__CH || []).join("");
-  if(!html){document.body.textContent="Missing game chunks.";return;}
-  document.open(); document.write(html); document.close();
-})();
-</script>
-</body></html>
+<html lang="en"><head><meta charset="utf-8">
+<meta http-equiv="refresh" content="0; url=alamat-prototype.html">
+<title>ALAMAT</title></head>
+<body><p style="font-family:system-ui;padding:2rem">
+This is the legacy single-file prototype (offline, localStorage saves). Redirecting to
+<a href="alamat-prototype.html">alamat-prototype.html</a>…<br>
+The maintained version is served by Django — see README.md (<code>python manage.py runserver</code>, then open <code>/</code>).
+</p></body></html>

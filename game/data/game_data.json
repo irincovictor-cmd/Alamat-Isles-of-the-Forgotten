@@ -1,0 +1,265 @@
+{
+ "_comment": "Single source of truth for species/moves/type chart. Read by Django (game/rules.py) and injected into the client via json_script. Balance numbers are provisional (see docs/GAME_DESIGN.md).",
+ "limits": {
+  "max_party": 3,
+  "max_level": 30,
+  "max_items": 99,
+  "xp_per_level": 25,
+  "starter_level": 5
+ },
+ "maps": {
+  "V": {
+   "name": "Lumina Village",
+   "w": 40,
+   "h": 30,
+   "spawn": [
+    19,
+    17
+   ]
+  },
+  "F": {
+   "name": "Balete Forest",
+   "w": 30,
+   "h": 24,
+   "spawn": [
+    14,
+    22
+   ]
+  },
+  "S": {
+   "name": "Ancient Shrine",
+   "w": 16,
+   "h": 12,
+   "spawn": [
+    7,
+    10
+   ]
+  }
+ },
+ "flags": [
+  "starter",
+  "bonded",
+  "shrine",
+  "gift",
+  "done"
+ ],
+ "species": {
+  "tarsilaw": {
+   "n": "Tarsilaw",
+   "t": "Nature",
+   "hp": 34,
+   "atk": 9,
+   "def": 6,
+   "spd": 8,
+   "a": "Leaf Pounce",
+   "xp": 40,
+   "up": "Vine Whip",
+   "up_lv": 7,
+   "starter": true,
+   "origin": "original_species"
+  },
+  "agilunos": {
+   "n": "Agilunos",
+   "t": "Wind",
+   "hp": 30,
+   "atk": 11,
+   "def": 5,
+   "spd": 11,
+   "a": "Talon Dive",
+   "xp": 42,
+   "up": "Sky Cut",
+   "up_lv": 7,
+   "starter": true,
+   "origin": "original_species"
+  },
+  "bagaon": {
+   "n": "Bagaon",
+   "t": "Fire",
+   "hp": 38,
+   "atk": 10,
+   "def": 8,
+   "spd": 5,
+   "a": "Ember Slam",
+   "xp": 45,
+   "up": "Flame Lick",
+   "up_lv": 7,
+   "starter": true,
+   "origin": "original_species"
+  },
+  "alitaptap": {
+   "n": "Alitaptap",
+   "t": "Spirit",
+   "hp": 24,
+   "atk": 8,
+   "def": 5,
+   "spd": 9,
+   "a": "Glow Burst",
+   "xp": 28,
+   "up": "Spirit Pulse",
+   "up_lv": 7,
+   "starter": false,
+   "origin": "original_species"
+  },
+  "lumot": {
+   "n": "Lumot",
+   "t": "Nature",
+   "hp": 30,
+   "atk": 7,
+   "def": 7,
+   "spd": 4,
+   "a": "Moss Slap",
+   "xp": 26,
+   "up": "Root Guard",
+   "up_lv": 7,
+   "starter": false,
+   "origin": "original_species"
+  },
+  "pakpak": {
+   "n": "Pakpak",
+   "t": "Wind",
+   "hp": 26,
+   "atk": 9,
+   "def": 4,
+   "spd": 10,
+   "a": "Gust Bite",
+   "xp": 30,
+   "up": "Quick Gust",
+   "up_lv": 7,
+   "starter": false,
+   "origin": "original_species"
+  },
+  "bato": {
+   "n": "Bato",
+   "t": "Earth",
+   "hp": 36,
+   "atk": 8,
+   "def": 10,
+   "spd": 3,
+   "a": "Stone Roll",
+   "xp": 32,
+   "up": null,
+   "up_lv": 7,
+   "starter": false,
+   "origin": "original_species"
+  },
+  "dagat": {
+   "n": "Dagat",
+   "t": "Water",
+   "hp": 32,
+   "atk": 8,
+   "def": 6,
+   "spd": 7,
+   "a": "Tide Snap",
+   "xp": 34,
+   "up": null,
+   "up_lv": 7,
+   "starter": false,
+   "origin": "original_species"
+  }
+ },
+ "moves": {
+  "Leaf Pounce": {
+   "p": 9,
+   "t": "Nature"
+  },
+  "Talon Dive": {
+   "p": 10,
+   "t": "Wind"
+  },
+  "Ember Slam": {
+   "p": 10,
+   "t": "Fire"
+  },
+  "Glow Burst": {
+   "p": 9,
+   "t": "Spirit"
+  },
+  "Moss Slap": {
+   "p": 8,
+   "t": "Nature"
+  },
+  "Gust Bite": {
+   "p": 9,
+   "t": "Wind"
+  },
+  "Stone Roll": {
+   "p": 9,
+   "t": "Earth"
+  },
+  "Tide Snap": {
+   "p": 9,
+   "t": "Water"
+  },
+  "Tackle": {
+   "p": 6,
+   "t": "Normal"
+  },
+  "Soothe": {
+   "k": 1
+  },
+  "Vine Whip": {
+   "p": 11,
+   "t": "Nature"
+  },
+  "Sky Cut": {
+   "p": 12,
+   "t": "Wind"
+  },
+  "Flame Lick": {
+   "p": 11,
+   "t": "Fire"
+  },
+  "Spirit Pulse": {
+   "p": 10,
+   "t": "Spirit"
+  },
+  "Root Guard": {
+   "p": 0,
+   "t": "Nature",
+   "def": 1
+  },
+  "Quick Gust": {
+   "p": 7,
+   "t": "Wind"
+  }
+ },
+ "type_chart": {
+  "Nature": {
+   "Water": 1.5,
+   "Earth": 1.5,
+   "Fire": 0.7,
+   "Wind": 1
+  },
+  "Fire": {
+   "Nature": 1.5,
+   "Wind": 1.2,
+   "Water": 0.7,
+   "Earth": 0.8
+  },
+  "Water": {
+   "Fire": 1.5,
+   "Earth": 1.3,
+   "Nature": 0.8,
+   "Wind": 1
+  },
+  "Wind": {
+   "Nature": 1.2,
+   "Spirit": 1.2,
+   "Earth": 0.7,
+   "Fire": 1
+  },
+  "Earth": {
+   "Fire": 1.2,
+   "Wind": 1.3,
+   "Water": 0.7,
+   "Nature": 0.9
+  },
+  "Spirit": {
+   "Spirit": 1.3,
+   "Nature": 1.1,
+   "Wind": 0.9,
+   "Earth": 1
+  },
+  "Normal": {}
+ }
+}

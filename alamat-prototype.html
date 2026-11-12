@@ -306,7 +306,7 @@ async function fade(to){
 function tickFade(){
   if(fadeTarget===null)return;
   const d=fadeTarget-S.fade;
-  if(Math.abs(d)<.03){S.fade=fadeTarget;fadeTarget=null;return}
+  if(Math.abs(d)<=.12){S.fade=fadeTarget;fadeTarget=null;return} /* snap within one step; the old <.03 test let 0.12 steps oscillate forever (0.96 <-> 1.08) */
   S.fade+=Math.sign(d)*.12;
 }
 

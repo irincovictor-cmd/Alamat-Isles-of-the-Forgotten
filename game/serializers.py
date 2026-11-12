@@ -1,32 +1,41 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
-from .models import PlayerSave
+from . import accounts
 
 User = get_user_model()
 
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=6)
+class RegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True, trim_whitespace=False, max_length=128)
 
-    class Meta:
-        model = User
-        fields = ('username', 'password')
+    def validate_username(self, value):
+        try:
+            return accounts.validate_new_username(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(exc.messages)
 
-    def validate_password(self, value):
-        validate_password(value)
-        return value
+    def validate(self, attrs):
+        # Validate against the real password rules once (no second, conflicting min_length).
+        try:
+            validate_password(attrs['password'], user=User(username=attrs['username']))
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({'password': list(exc.messages)})
+        return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(
-            username=validated_data['username'],
-            password=validated_data['password'],
-        )
+        try:
+            with transaction.atomic():
+                return User.objects.create_user(
+                    username=validated_data['username'], password=validated_data['password'])
+        except IntegrityError:  # lost a race with another registration
+            raise serializers.ValidationError({'username': ['That username is already taken.']})
 
 
-class SaveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PlayerSave
-        fields = ('data', 'updated_at')
-        read_only_fields = ('updated_at',)
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(trim_whitespace=False, max_length=128)

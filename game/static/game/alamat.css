@@ -1,0 +1,23 @@
+:root{--bg:#f5f0e7;--fg:#142638;--ac:#317f91;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1823;--fg:#f5f0e7}}
+:root[data-theme="dark"]{--bg:#0d1823;--fg:#f5f0e7}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:14px "Trebuchet MS",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;overflow:hidden}
+#g{width:min(96vw,calc((100dvh - 150px)*4/3));aspect-ratio:4/3;image-rendering:pixelated;border:3px solid var(--fg);border-radius:6px;background:#142638;touch-action:none}
+#pad{display:none;width:min(96vw,520px);justify-content:space-between;align-items:center;user-select:none}
+.dp{display:grid;grid-template-areas:". u ." "l . r" ". d .";gap:4px}
+.dp button:nth-child(1){grid-area:u}.dp button:nth-child(2){grid-area:l}.dp button:nth-child(3){grid-area:d}.dp button:nth-child(4){grid-area:r}
+.ab{display:flex;gap:14px}
+#pad button{width:52px;height:52px;border-radius:50%;border:2px solid var(--fg);background:var(--ac);color:#f5f0e7;font:bold 18px system-ui;touch-action:none}
+@media (hover:none) and (pointer:coarse){#pad{display:flex}}
+#foot{margin:0;text-align:center;font-size:12px;opacity:.8;max-width:96vw}
+#bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;width:min(96vw,640px)}
+#bar button{border:2px solid var(--fg);background:var(--ac);color:#f5f0e7;font:bold 13px system-ui;padding:8px 14px;border-radius:8px;cursor:pointer}
+#bar button:hover{filter:brightness(1.1)}
+#bar button#btn-reset{background:#8B3A3A}
+#bar form{margin:0;display:inline}
+#bar .who{font-size:12px;opacity:.85;padding:0 4px}
+#bar button#btn-new{background:#6b5a8c}
+#bar button#btn-out{background:transparent;color:var(--fg)}
+#status{min-height:1.2em;margin:0;font-size:12px;text-align:center}
+

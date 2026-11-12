@@ -12,6 +12,9 @@ class PlayerSave(models.Model):
     )
     # JSON blob compatible with localStorage format from the prototype
     data = models.JSONField(default=dict, blank=True)
+    # Incremented on every successful save. Clients send the revision they last saw
+    # so an old browser tab cannot silently overwrite newer progress (HTTP 409).
+    revision = models.PositiveIntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
