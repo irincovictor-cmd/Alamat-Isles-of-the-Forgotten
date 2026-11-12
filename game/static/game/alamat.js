@@ -33,7 +33,8 @@ function drawActor(ctx,pal,dir,frame,x,y){
  const fallback=charSprite(pal,dir,frame),img=asset(key,fallback);
  if(img===fallback){ctx.drawImage(fallback,x,y);return}
  // Sprite sheet: four columns (frames), four rows (down/up/left/right), 64x64 cells.
- if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,dir*64,64,64,x,y,64,64);
+ if(img.width===128&&img.height===192)ctx.drawImage(img,(frame%4)*32,dir*48,32,48,x+16,y+15,32,48);
+ else if(img.width>=256&&img.height>=256)ctx.drawImage(img,(frame%4)*64,dir*64,64,64,x,y,64,64);
  else ctx.drawImage(img,x,y,64,64); // single-frame portraits are also supported
 }
 function drawObject(ctx,o,x,y){
@@ -143,8 +144,8 @@ function buildVillage(){const m=newMap('Lumina Village',40,30,0);
  scatter(m,S_.tree,40,ok);scatter(m,S_.palm,14,ok);
  for(let y=1;y<22;y+=3){if(ok(0,y)&&!m.sol[y*40])place(m,S_.tree,0,y,1,1,{tree:1});if(ok(39,y)&&!m.sol[y*40+39])place(m,S_.tree,39,y,1,1,{tree:1})}
  m.npcs.push({id:'luz',name:'Ate Luz',x:21,y:14,dir:2,pal:{id:'luz',top:P.off,trim:P.teal,pants:'#3B4A6B',boots:P.dk,hair:'#3A2A20'}},
-  {id:'dina',name:'Nanay Dina',x:11,y:21,dir:0,pal:{id:'dina',top:'#B5573A',trim:P.gold,pants:'#6B5A4A',boots:P.dk,hair:'#9AA0A8'}},
-  {id:'tonyo',name:'Mang Tonyo',x:27,y:21,dir:1,pal:{id:'tonyo',top:P.gold,trim:P.roof,pants:'#4A5A3A',boots:P.dk,hair:'#1B1B24'}});
+  {id:'dina',name:'Nanay Dina',x:12,y:16,dir:0,pal:{id:'dina',top:'#B5573A',trim:P.gold,pants:'#6B5A4A',boots:P.dk,hair:'#9AA0A8'}},
+  {id:'tonyo',name:'Mang Tonyo',x:30,y:16,dir:1,pal:{id:'tonyo',top:P.gold,trim:P.roof,pants:'#4A5A3A',boots:P.dk,hair:'#1B1B24'}});
  m.exits.forEach(e=>{m.sol[e.y*m.w+e.x]=0});
  bake(m);return m}
 function buildForest(){const m=newMap('Balete Forest',30,24,6);
