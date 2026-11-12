@@ -132,6 +132,17 @@ def sanitize_save(raw: Any) -> tuple[dict[str, Any], list[str]]:
         raise SaveError(f'party can hold at most {LIMITS["max_party"]} creatures')
     party = [_creature(c, i, adjusted) for i, c in enumerate(party_raw)]
 
+    # Permanent Dex discoveries belong to the account, not just today's party.
+    # Legacy saves lack 'dex'; seed from their current party on migration.
+    owned_raw = raw.get('dex', [])
+    if not isinstance(owned_raw, list) or len(owned_raw) > len(SPECIES):
+        raise SaveError('dex must be a list with at most one entry per species')
+    if any(not isinstance(sid, str) or sid not in SPECIES for sid in owned_raw):
+        raise SaveError('dex contains an unknown species')
+    owned = set(owned_raw)
+    owned.update(c['id'] for c in party)
+    dex = [sid for sid in DATA['dex_order'] if sid in owned]
+
     selyo = _clamp(_int(raw.get('selyo', 3), 'selyo'), 0, LIMITS['max_items'], 'selyo', adjusted)
     herbs = _clamp(_int(raw.get('herbs', 2), 'herbs'), 0, LIMITS['max_items'], 'herbs', adjusted)
 
@@ -184,7 +195,7 @@ def sanitize_save(raw: Any) -> tuple[dict[str, Any], list[str]]:
     d = d if 0 <= d <= 3 else 0
 
     clean = {
-        'party': party, 'selyo': selyo, 'herbs': herbs, 'f': f,
+        'party': party, 'dex': dex, 'selyo': selyo, 'herbs': herbs, 'f': f,
         'mapId': map_id, 'x': xi, 'y': yi, 'dir': d,
     }
     return clean, adjusted
@@ -192,4 +203,4 @@ def sanitize_save(raw: Any) -> tuple[dict[str, Any], list[str]]:
 
 def client_data() -> dict[str, Any]:
     """What the browser needs (no server-only fields)."""
-    return {k: DATA[k] for k in ('limits', 'maps', 'species', 'moves', 'type_chart')}
+    return {k: DATA[k] for k in ('limits', 'maps', 'species', 'moves', 'type_chart', 'dex_order', 'attribute_names', 'encounters')}
