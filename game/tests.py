@@ -25,6 +25,20 @@ def valid_save(**over):
     return data
 
 
+class AdminSetupCommandTests(TestCase):
+    def test_setupadmin_is_registered_and_requires_terminal(self):
+        from django.core.management import get_commands, call_command, CommandError
+        from unittest.mock import patch
+        from io import StringIO
+
+        self.assertIn('setupadmin', get_commands())
+        with patch('game.management.commands.setupadmin.Command.stdin_is_interactive',
+                   return_value=False):
+            with self.assertRaisesMessage(CommandError, 'interactive terminal'):
+                call_command('setupadmin', stdout=StringIO())
+        self.assertFalse(User.objects.filter(is_superuser=True).exists())
+
+
 class CacheClearMixin:
     def setUp(self):
         super().setUp()
