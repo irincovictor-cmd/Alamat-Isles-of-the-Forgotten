@@ -33,12 +33,17 @@ Each atlas contains 15 tree sprites arranged in a 4×4 grid of 128×128 cells; t
 
 **Academic asset permission:** The creator of this tree pack granted academic-use permission to the project owner. This repository intentionally does not include the licensed tree PNGs: obtain them from the creator and place them at the paths above. Redistribution in a public source repository requires separately confirmed permission. Source: https://last-tick.itch.io/2d-forest-free-128x128.
 
-## Szadi Art Houses Pack — current building replacement
+## Szadi Art Houses Pack — finished houses (current)
 
-Place `game/static/game/assets/environment/buildings/szadi_houses.png` (the original 1024×1024 `houses.png` atlas) in your local project. The game assembles roofs and walls into complete building facades, with variants for the player home, research center, healing house, and neighbors. Collisions, map footprints, and interactions remain unchanged. Missing atlas files fall back to the original procedural buildings.
+The current renderer loads **complete house sprites**, avoiding transparent roof/wall gaps and duplicate overlaid doors. Extract `Alamat_Houses_Fixed.zip` from the private Google Drive folder **Alamat Game Assets** into your project root (`C:\\Users\\vtemp\\alamat`), merging the `game` folder.
 
-Installation package: `Alamat_Szadi_Houses_Local.zip` in the private Google Drive folder **Alamat Game Assets**. Unzip it at the project root (`C:\\Users\\vtemp\\alamat`) and merge the `game` directory.
+Expected files inside `game/static/game/assets/environment/buildings/finished/`:
+- `home.png`
+- `research.png`
+- `healing.png`
+- `neighbor_a.png`
+- `neighbor_b.png`
 
-Art by Szadi Art: https://szadiart.itch.io/houses-pack. The included license permits personal/commercial use and modifications without mandatory credit; reselling the asset pack is not permitted. The prior Quiet Village atlas is no longer referenced by the current building renderer and can be archived or removed locally after verifying the replacement.
+Each image is preassembled from Szadi Art's original modular Houses Pack, with its original wooden door preserved. The game keeps the existing building footprint, collision, and interaction positions. When a finished image is missing, the code-generated fallback is used.
 
-Note: Building proportions and appearance still need verification in the running browser, as the game uses different map-sized building footprints.
+The older `environment/buildings/szadi_houses.png` and `quiet_village.png` are no longer used by the house renderer and may be archived locally once the new buildings are verified. Source: https://szadiart.itch.io/houses-pack. Follow the creator's license for game use and distribution.
