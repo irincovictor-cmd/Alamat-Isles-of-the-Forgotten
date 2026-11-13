@@ -138,6 +138,19 @@ New users can register at **http://127.0.0.1:8000/register/**. The main site is 
 
 This address is local to the machine running Django; it is **not** a publicly deployed game.
 
+### Play by IP address on another device (same Wi-Fi / LAN)
+
+On the Windows PC hosting the game, open a terminal in the project folder and run:
+
+```cmd
+powershell -ExecutionPolicy Bypass -File .\run_lan.ps1
+```
+
+The launcher prints your current local-network URL, for example `http://192.168.1.25:8000/play/`. Open the **actual printed address** on another PC or phone connected to the **same Wi-Fi / LAN**. The server computer must stay on while others play. If connections fail, Windows Defender Firewall may need an inbound **TCP 8000** allowance for **Private** networks (ask the administrator first on a managed school network). LAN guest/client isolation can also block access.
+
+**LAN access is not public Internet deployment.** Never port-forward Django's `runserver` or expose it to the public Internet. For a public game URL, configure a production web server, HTTPS, correct hosts and secure secrets, static asset hosting and a persistent database. See [SETUP_INSTRUCTIONS.txt](SETUP_INSTRUCTIONS.txt) for local-network troubleshooting.
+
+
 ### Installing optional art and music
 
 Some approved image assets and the recorded soundtrack are distributed separately from the public repository. Missing assets may display fallback artwork or an explicit missing-art notice.
