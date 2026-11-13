@@ -180,7 +180,46 @@ Then open:
   http://127.0.0.1:8000/play/
 
 
-10. IMPORTANT NOTES
+10. PLAY ALAMAT BY IP ADDRESS (SAME WI-FI / SCHOOL LAN)
+--------------------------------------------------------
+Use this when another laptop or phone should open the game hosted by
+YOUR Windows PC. The PC running Django must stay on.
+
+FIRST TIME: pull the latest repo update (in Command Prompt):
+  cd C:\Users\vtemp\alamat
+  git pull --ff-only origin main
+
+START THE LAN SERVER (PowerShell, from the project folder):
+  powershell -ExecutionPolicy Bypass -File .\run_lan.ps1
+
+The launcher automatically detects your Windows LAN IPv4 address,
+sets DJANGO_ALLOWED_HOSTS to that address and localhost, and starts
+Django listening on 0.0.0.0:8000. It prints a URL such as:
+
+  http://192.168.1.25:8000/play/
+
+This is only an EXAMPLE. Use the IP printed on YOUR computer.
+Your friends must be connected to the SAME local Wi-Fi / LAN.
+Opening 127.0.0.1 on another device points to that OTHER device,
+not to your game server.
+
+If the URL cannot be reached, check that:
+  - Django is still running on the host PC.
+  - Both devices are on the same LAN (not an isolated guest network).
+  - Windows Defender Firewall allows inbound TCP port 8000 on
+    PRIVATE network profiles. Ask the network administrator first
+    if you are on a managed school network.
+  - VPNs, client isolation, or security policy are not blocking
+    device-to-device connections.
+
+This is for trusted local development and demonstrations ONLY.
+Never port-forward port 8000 or publish the Django runserver to
+the public Internet. For real online deployment, use a production
+application server, HTTPS, a stable hosting address, secure secrets,
+a proper static file setup and a persistent database.
+
+
+11. IMPORTANT NOTES
 -------------------
 - GitHub contains the source code, not necessarily every art/audio asset.
 - Google Drive or a USB drive can hold your private assets backup.
