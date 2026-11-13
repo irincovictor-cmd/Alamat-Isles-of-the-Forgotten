@@ -25,6 +25,7 @@
 <p id="foot">Arrows/WASD · E interact · P party · B storage · K Dex · G guide · F5 save · F9 load</p>
 {{ game_data|json_script:"alamat-data" }}
 {{ game_config|json_script:"alamat-config" }}
-<script src="{% static 'game/alamat-music.js' %}"></script>
-<script src="{% static 'game/alamat.js' %}"></script>
+{# Cache-bust static JavaScript when map assets/placements change. #}
+<script src="{% static 'game/alamat-music.js' %}?v=20261113-audio"></script>
+<script src="{% static 'game/alamat.js' %}?v=20261113-shrine-replacement-2"></script>
 </body></html>
