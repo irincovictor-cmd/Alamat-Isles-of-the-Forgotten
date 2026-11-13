@@ -1,0 +1,199 @@
+ALAMAT: ISLES OF THE FORGOTTEN
+SETUP AND TRANSFER INSTRUCTIONS (WINDOWS)
+=========================================
+
+PROJECT REPOSITORY
+https://github.com/irincovictor-cmd/Alamat-Isles-of-the-Forgotten
+
+LOCAL GAME ADDRESS
+http://127.0.0.1:8000/play/
+
+IMPORTANT
+---------
+The source code is on GitHub, but some of the game's images and music
+are installed separately. If you want the same creatures, buildings,
+forest, and soundtrack as the original computer, you must also copy
+the complete assets folder.
+
+The game runs on a local Django server. Opening HTML files directly,
+or opening localhost on a different device, will not run the game.
+
+
+1. INSTALL REQUIREMENTS
+-----------------------
+On the new Windows PC, install:
+  - Python 3 and pip: https://www.python.org/downloads/
+  - Git for Windows: https://git-scm.com/downloads/win
+  - A modern browser (Chrome, Brave, Edge, Firefox)
+
+Make sure Python and Git are available in Command Prompt:
+  python --version
+  git --version
+
+
+2. DOWNLOAD THE GAME SOURCE CODE
+--------------------------------
+Open Command Prompt and run:
+
+  cd %USERPROFILE%
+  git clone https://github.com/irincovictor-cmd/Alamat-Isles-of-the-Forgotten.git
+  cd Alamat-Isles-of-the-Forgotten
+
+If you already cloned it earlier, open that folder and run:
+  git pull --ff-only origin main
+
+
+3. INSTALL PYTHON DEPENDENCIES
+-----------------------------
+From inside the game folder, run:
+
+  python -m venv .venv
+  .venv\Scripts\activate
+  python -m pip install -r requirements.txt
+
+After activation, your Command Prompt should show (.venv).
+
+
+4. INSTALL THE GAME ART AND MUSIC
+--------------------------------
+On your original PC, back up the ENTIRE folder:
+
+  game\static\game\assets\
+
+Zip it, and transfer it through your private Google Drive or a USB
+drive. The new computer should end up with the same folder structure:
+
+  game\static\game\assets\characters\
+  game\static\game\assets\creatures\
+  game\static\game\assets\environment\
+  game\static\game\assets\tiles\
+  game\static\game\assets\audio\
+
+Important individual file examples:
+
+  game\static\game\assets\environment\buildings\finished\ancient_shrine.png
+  game\static\game\assets\creatures\agilunos\battle\front.png
+  game\static\game\assets\audio\village_compilation.mp3
+
+If Windows asks whether to merge folders or replace duplicate
+assets, choose the appropriate merge/replace option.
+
+A ZIP of the project source alone DOES NOT necessarily contain all
+these custom assets.
+
+
+5. CHOOSE WHETHER TO TRANSFER YOUR SAVED PROGRESS
+-------------------------------------------------
+OPTION A: FRESH INSTALLATION (NEW ACCOUNTS)
+  Run:
+    python manage.py migrate
+
+  This initializes a new local database. You can register a new
+  player account from the game in your browser.
+
+OPTION B: KEEP EXISTING ACCOUNTS AND PROGRESS
+  On the ORIGINAL PC:
+    - Stop the Django server.
+    - Back up the file db.sqlite3 from the project root.
+    - Transfer this file privately to the new PC.
+
+  On the NEW PC:
+    - Stop Django if it is running.
+    - Back up any existing db.sqlite3 there.
+    - Paste the original db.sqlite3 into the new project's root.
+    - Start Django normally and sign in with your existing account.
+
+  WARNING: Replacing db.sqlite3 replaces the new PC's local
+  accounts and saves. Never post this file publicly or commit
+  it to GitHub. The databases on two PCs do NOT automatically sync.
+
+  Note: If your installation uses a custom DJANGO_DB_PATH setting,
+  transfer the configured database file instead of the default one.
+
+
+6. START ALAMAT
+--------------
+With Command Prompt open inside the project folder and the Python
+virtual environment active, run:
+
+  python manage.py runserver
+
+Open your browser:
+  http://127.0.0.1:8000/play/
+
+For registration:
+  http://127.0.0.1:8000/register/
+
+For an existing install, log in with your account. For a fresh
+install, create a new player account.
+
+Do not close the terminal running the server while playing.
+
+
+7. OPTIONAL: CREATE A NEW ADMIN ACCOUNT
+---------------------------------------
+Only do this on a local computer/server you control. In the
+project folder, after migration, run:
+
+  python manage.py setupadmin
+
+Follow the prompts to create a unique username and strong password.
+The administrator can access:
+  http://127.0.0.1:8000/admin/
+
+The "Load All Creatures" testing control requires an authorized
+staff/superuser account and local development mode (DEBUG).
+
+
+8. TEST THE INSTALLATION
+------------------------
+To run Django tests (stop the development server first):
+
+  python manage.py test game
+
+After starting the server, check:
+  - Lumina Village, Balete Forest, and Ancient Shrine are accessible.
+  - Buildings, creature artwork, and the soundtrack load correctly.
+  - The music on/off button and volume slider work.
+  - Saving and loading progress work after login.
+
+If an asset does not appear, check its exact path, capitalization,
+and .png/.mp3 extension. Then refresh with Ctrl + Shift + R.
+
+Check the shrine image by opening:
+  http://127.0.0.1:8000/static/game/assets/environment/buildings/finished/ancient_shrine.png
+
+Check the music file by opening:
+  http://127.0.0.1:8000/static/game/assets/audio/village_compilation.mp3
+
+If either URL returns 404, the file is missing or in the wrong folder.
+
+
+9. NEXT TIME YOU PLAY
+---------------------
+Open Command Prompt in your game folder and run:
+
+  .venv\Scripts\activate
+  python manage.py runserver
+
+Then open:
+  http://127.0.0.1:8000/play/
+
+
+10. IMPORTANT NOTES
+-------------------
+- GitHub contains the source code, not necessarily every art/audio asset.
+- Google Drive or a USB drive can hold your private assets backup.
+- db.sqlite3 holds local accounts and saved progress.
+- Do not share .env files, database files, passwords, or secret keys publicly.
+- Do not include .venv, __pycache__, or temporary cache folders in a backup.
+- Running separate local servers on two devices does not synchronize saves.
+- To play on a phone or over the Internet, Django must be hosted on a
+  reachable server; localhost on a PC is not accessible from other devices.
+- The Django development server is for local testing, not public hosting.
+
+FOR MORE DETAILS
+----------------
+README.md
+docs/INSTALL_ON_ANOTHER_DEVICE.md
+docs/GAME_MUSIC.md
