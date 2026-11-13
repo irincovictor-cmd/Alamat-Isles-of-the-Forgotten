@@ -21,3 +21,10 @@ body{background:var(--bg);color:var(--fg);font:14px "Trebuchet MS",system-ui,san
 #bar button#btn-out{background:transparent;color:var(--fg)}
 #status{min-height:1.2em;margin:0;font-size:12px;text-align:center}
 
+
+/* Compact, accessible soundtrack controls; preserve space on small screens. */
+#bar .music-control{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 5px;white-space:nowrap}
+#bar #music-volume{width:82px;accent-color:var(--ac);cursor:pointer}
+#bar #music-volume-label{display:inline-block;min-width:29px;text-align:right;font-variant-numeric:tabular-nums}
+#bar #btn-music[aria-pressed="false"]{background:#586470;color:#f5f0e7}
+@media(max-width:480px){#bar .music-control{width:100%;justify-content:center}#bar #music-volume{width:110px}}
