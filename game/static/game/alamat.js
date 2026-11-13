@@ -323,8 +323,14 @@ function buildShrine(){const m=newMap('Ancient Shrine',16,12,6);
  fill(m,2,6,0,4,12);fill(m,5,2,4,4,4);fill(m,5,10,4,4,4);
  m.exits.push({x:7,y:11,to:'F',tx:14,ty:1,dir:0},{x:8,y:11,to:'F',tx:15,ty:1,dir:0});
  m.enc=DATA.encounters?.S||['alitaptap','dagat','bato','pakpak'];m.dark=1;
- // The old procedural shrine hut has been retired. Its former tiles are clear
- // until the approved shrine PNG is installed and placed in a later update.
+ // Approved 256×192 shrine sprite. Keep the approach at (8,7) walkable
+ // and the southern forest exit clear; collision is only the building footprint.
+ // The PNG is an optional local asset and never committed to public GitHub.
+ place(m,mk(256,192)[0],4,1,8,6,{
+  buildingAsset:'ancient_shrine',nm:'Ancient Shrine',
+  say:['Weathered stone and glowing turquoise runes. The Lilim’s influence is strong here…'],
+  at:[8,6]
+ });
  place(m,S_.btree,1,1,1,1,{tree:1});place(m,S_.btree,14,1,1,1,{tree:1});
  place(m,S_.btree,1,8,1,1,{tree:1});place(m,S_.btree,14,8,1,1,{tree:1});
  m.exits.forEach(e=>{m.sol[e.y*m.w+e.x]=0});
@@ -885,7 +891,12 @@ const TESTS=[
  ['NPC found on facing tile',()=>!!npcAt(V,21,14)],
  ['Forest has encounter grass and exits',()=>F.g.includes(5)&&F.exits.length>=2],
  ['Shrine map exists and links',()=>SH.w===16&&SH.exits.length>=1],
- ['Old procedural shrine removed without blocking its tiles',()=>!SH.objs.some(o=>o.nm==='Ancient Shrine')&&canWalk(SH,6,3)&&SH.exits.length>=1],
+ ['Ancient Shrine replacement art and accessible entrance',()=>{
+  const o=SH.objs.find(o=>o.buildingAsset==='ancient_shrine');
+  return !!o&&o.x===4&&o.y===1&&o.w===8&&o.h===6
+   &&SH.sol[6*SH.w+8]===1&&canWalk(SH,8,7)&&SH.exits.length>=1
+   &&!SH.objs.some(z=>z.spr===S_.shrine);
+ }],
  ['Creatures have required stats',()=>['tarsilaw','bato','dagat'].every(id=>SP[id]&&SP[id].hp>0)],
  ['mkC produces valid party member',()=>{const c=mkC('tarsilaw',5);return c.hp===c.max&&c.mv.length>=3&&c.lv===5}],
  ['Type chart returns multipliers',()=>typeMult('Fire','Nature')>1&&typeMult('Water','Fire')>1],
