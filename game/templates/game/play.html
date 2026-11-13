@@ -12,6 +12,8 @@
   <button type="button" id="btn-storage" title="Creature Storage (B)">Storage</button>
   {% if game_config.canTestRoster %}<button type="button" id="btn-admin-roster" title="Populate this admin account with all 15 test creatures">Load All Creatures</button>{% endif %}
   <button type="button" id="btn-guide" title="Open attribute guide (G)">Guide</button>
+  <button type="button" id="btn-music" title="Toggle background music (M)" aria-pressed="true">♫ Music: On</button>
+  <label class="music-control" for="music-volume">Volume <input id="music-volume" type="range" min="0" max="100" step="5" value="28" aria-label="Music volume"><span id="music-volume-label">28%</span></label>
   <button type="button" id="btn-save" title="Save to your account (F5)">Save</button>
   <button type="button" id="btn-load" title="Load from your account (F9)">Load</button>
   <button type="button" id="btn-new" title="Start a new game (N on the title screen)">New game</button>
@@ -23,5 +25,6 @@
 <p id="foot">Arrows/WASD · E interact · P party · B storage · K Dex · G guide · F5 save · F9 load</p>
 {{ game_data|json_script:"alamat-data" }}
 {{ game_config|json_script:"alamat-config" }}
+<script src="{% static 'game/alamat-music.js' %}"></script>
 <script src="{% static 'game/alamat.js' %}"></script>
 </body></html>
