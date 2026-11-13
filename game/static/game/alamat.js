@@ -771,6 +771,8 @@ function drawLoading(){
   c.fillStyle=P.teal;c.fillRect(bx,by,bw*prog,bh);
 }
 function frame(ts){const dt=Math.min(50,ts-(frame.l||ts));frame.l=ts;
+ // Seamless zone/battle music switches; audio remains optional if unsupported.
+ window.ALAMAT_MUSIC?.setScene(S.mode==='battle'?'battle':S.mode==='title'?'title':S.mapId);
  try{tickFade();update(dt)}catch(err){console.error('update',err)}
  c.clearRect(0,0,W,H);
  if(S.mode!=='title'){c.fillStyle='#1a3a4a';c.fillRect(0,0,W,H)}
@@ -864,6 +866,7 @@ const TESTS=[
  ['Reserve capacity and starting state',()=>LIM.max_storage===30&&Array.isArray(S.storage)],
  ['Menu switching uses one controller',()=>typeof switchMenu==='function'&&typeof storageInput==='function'&&typeof dexInput==='function'],
  ['Attribute badges and heart indicators exist',()=>Object.keys(ATTR_STYLE).length===8&&typeof badgeType==='function'&&typeof hpHeart==='function'],
+ ['Music controls and scene switching are initialized',()=>!!window.ALAMAT_MUSIC&&typeof window.ALAMAT_MUSIC.setScene==='function'],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
  ['Rebuilt village uses PNG buildings without coconut palms or old stall',()=>{
   const required=['home','research','healing','potion_shop','general_shop','supply_storage','forge'];
