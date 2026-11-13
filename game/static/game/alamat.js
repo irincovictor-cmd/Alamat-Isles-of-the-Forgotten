@@ -326,10 +326,10 @@ function buildShrine(){const m=newMap('Ancient Shrine',16,12,6);
  // Compact 160×128 shrine sprite on a 5×4-tile footprint.
  // The entrance faces south: stand at (7,6) and interact with (7,5).
  // The existing forest exit remains clear; artwork is installed separately.
- place(m,mk(160,128)[0],5,2,5,4,{
+ place(m,mk(160,128)[0],4,2,5,4,{
   buildingAsset:'ancient_shrine',nm:'Ancient Shrine',
   say:['Weathered stone and glowing turquoise runes. The Lilim’s influence is strong here…'],
-  at:[7,5]
+  at:[6,5]
  });
  place(m,S_.btree,1,1,1,1,{tree:1});place(m,S_.btree,14,1,1,1,{tree:1});
  place(m,S_.btree,1,8,1,1,{tree:1});place(m,S_.btree,14,8,1,1,{tree:1});
@@ -893,9 +893,9 @@ const TESTS=[
  ['Shrine map exists and links',()=>SH.w===16&&SH.exits.length>=1],
  ['Ancient Shrine replacement art and accessible entrance',()=>{
   const o=SH.objs.find(o=>o.buildingAsset==='ancient_shrine');
-  return !!o&&o.x===5&&o.y===2&&o.w===5&&o.h===4
+  return !!o&&o.x===4&&o.y===2&&o.w===5&&o.h===4
    &&o.spr.width===160&&o.spr.height===128
-   &&SH.sol[5*SH.w+7]===1&&canWalk(SH,7,6)&&SH.exits.length>=1
+   &&SH.sol[5*SH.w+6]===1&&canWalk(SH,6,6)&&SH.exits.length>=1
    &&!SH.objs.some(z=>z.spr===S_.shrine);
  }],
  ['Creatures have required stats',()=>['tarsilaw','bato','dagat'].every(id=>SP[id]&&SP[id].hp>0)],
