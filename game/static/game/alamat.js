@@ -840,8 +840,76 @@ addEventListener('keydown',e=>{
  if(e.key==='F9'){e.preventDefault();if(S.mode==='title'||(S.mode==='world'&&!S.busy))loadGame(false);return}
  const a=KM[e.key.length>1?e.key:e.key.toLowerCase()];if(a){e.preventDefault();if(!e.repeat||a in held||a==='up'||a==='down')kd(a)}});
 addEventListener('keyup',e=>{const a=KM[e.key.length>1?e.key:e.key.toLowerCase()];if(a)ku(a)});
-document.querySelectorAll('#pad button').forEach(b=>{const a=b.dataset.a;b.addEventListener('pointerdown',e=>{e.preventDefault();kd(a)});for(const ev of['pointerup','pointerleave','pointercancel'])b.addEventListener(ev,()=>ku(a))});
-cv.addEventListener('pointerdown',()=>{if(S.mode==='title')dispatch('ok')});
+// Phone gamepad: one pointer owns each pressed control. Holding directions
+// repeats movement, while confirm/back fire only once per press.
+document.querySelectorAll('#pad button').forEach(b=>{
+ const a=b.dataset.a;
+ b.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  try{b.setPointerCapture(e.pointerId)}catch(err){}
+  b.dataset.pointerId=String(e.pointerId);
+  kd(a);
+ });
+ const release=e=>{
+  if(b.dataset.pointerId!==String(e.pointerId))return;
+  delete b.dataset.pointerId;
+  ku(a);
+ };
+ b.addEventListener('pointerup',release);
+ b.addEventListener('pointercancel',release);
+ b.addEventListener('lostpointercapture',release);
+});
+window.addEventListener('blur',()=>{for(const a of Object.keys(held))held[a]=0});
+// Convert a canvas tap into the game's fixed 640x480 coordinate system,
+// so responsive CSS scaling never changes which menu option was touched.
+function tapGame(x,y){
+ if(S.mode==='title'){dispatch('ok');return}
+ if(S.mode==='battle'){
+  if(B?.ui){
+   const i=B.ui.opts.findIndex((_,n)=>{
+    const px=340+(n%2)*136,py=371+Math.floor(n/2)*30;
+    return x>=px-5&&x<px+129&&y>=py-3&&y<py+28;
+   });
+   if(i>=0){B.ui.sel=i;dispatch('ok');return}
+  }
+  // Tap the dialogue panel to advance a message.
+  if(y>=350&&waiter){dispatch('ok');return}
+ }
+ if(U&&y>=75&&y<=392){
+  const index=Math.floor((x-22)/204);
+  if(index>=0&&index<U.ids.length){
+   U.sel=index;dispatch('ok');return;
+  }
+ }
+ if(STORAGE&&y>=140&&y<420){
+  const row=Math.floor((y-144)/39);
+  const list=STORAGE.swap?S.party:STORAGE.tab==='reserve'?S.storage:S.party;
+  const currentPage=Math.floor(STORAGE.sel/7);
+  const index=currentPage*7+row;
+  if(row>=0&&index<list.length){STORAGE.sel=index;dispatch('ok');return}
+ }
+ if(DEX&&DEX.tab==='dex'&&y>=77&&y<342){
+  const col=Math.floor((x-20)/122),row=Math.floor((y-77)/91);
+  if(col>=0&&col<5&&row>=0&&row<3&&
+     x>=20+col*122&&x<132+col*122){
+   DEX.sel=row*5+col;return;
+  }
+ }
+ if(PARTY&&PARTY.mode==='list'&&y>=82&&y<355){
+  const index=Math.floor((y-82)/90);
+  if(index>=0&&index<S.party.length){PARTY.sel=index;dispatch('ok');return}
+ }
+ if(DG||waiter){dispatch('ok');return}
+ if(S.mode==='world'&&!S.busy){dispatch('ok')}
+}
+cv.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ e.preventDefault();
+ const r=cv.getBoundingClientRect();
+ // Account for the canvas border, as CSS scales its content box.
+ const x=(e.clientX-r.left)*W/r.width,y=(e.clientY-r.top)*H/r.height;
+ tapGame(x,y);
+});
 $('btn-reset').addEventListener('click',()=>unstick());
 $('btn-party').addEventListener('click',()=>switchMenu('party'));
 $('btn-dex').addEventListener('click',()=>switchMenu('dex'));
@@ -873,6 +941,7 @@ const TESTS=[
  ['Menu switching uses one controller',()=>typeof switchMenu==='function'&&typeof storageInput==='function'&&typeof dexInput==='function'],
  ['Attribute badges and heart indicators exist',()=>Object.keys(ATTR_STYLE).length===8&&typeof badgeType==='function'&&typeof hpHeart==='function'],
  ['Music controls and scene switching are initialized',()=>!!window.ALAMAT_MUSIC&&typeof window.ALAMAT_MUSIC.setScene==='function'],
+ ['Responsive canvas tap and touch gamepad handlers exist',()=>typeof tapGame==='function'&&!!document.querySelector('#pad button[data-a="ok"]')],
  ['Village map is 40×30 tiles',()=>V.w===40&&V.h===30],
  ['Rebuilt village uses PNG buildings without coconut palms or old stall',()=>{
   const required=['home','research','healing','potion_shop','general_shop','supply_storage','forge'];
