@@ -2,9 +2,13 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ALAMAT: Isles of the Forgotten</title>
-<link rel="stylesheet" href="{% static 'game/alamat.css' %}">
+<link rel="stylesheet" href="{% static 'game/alamat.css' %}?v=20261114-mobile1">
 </head><body>
-<canvas id="g" role="img" aria-label="ALAMAT game canvas. Arrow keys or WASD to move, E or Space to interact, P for party."></canvas>
+<main id="game-shell">
+<div id="game-stage">
+<canvas id="g" role="img" aria-label="ALAMAT game. Use the touch direction pad and A/B buttons on a phone, or arrow keys and Enter on a keyboard."></canvas>
+</div>
+<div id="mobile-help">Touch controls: move with arrows, A = select/talk, B = back. Tap creatures or menu options directly.</div>
 <div id="bar">
   <button type="button" id="btn-reset" title="Clear a stuck screen (F3)">Reset view</button>
   <button type="button" id="btn-party" title="Open party (P)">Party</button>
@@ -20,12 +24,24 @@
   <span class="who">Signed in as <strong>{{ username }}</strong></span>
   <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit" id="btn-out">Log out</button></form>
 </div>
-<div id="pad"><div class="dp"><button data-a="up">▲</button><button data-a="left">◀</button><button data-a="down">▼</button><button data-a="right">▶</button></div><div class="ab"><button data-a="back">B</button><button data-a="ok">A</button></div></div>
+<div id="pad" aria-label="Touch game controls">
+  <div class="dp" aria-label="Directional pad">
+    <button type="button" data-a="up" aria-label="Move up">▲</button>
+    <button type="button" data-a="left" aria-label="Move left">◀</button>
+    <button type="button" data-a="down" aria-label="Move down">▼</button>
+    <button type="button" data-a="right" aria-label="Move right">▶</button>
+  </div>
+  <div class="ab">
+    <button type="button" data-a="back" aria-label="Cancel or go back">B</button>
+    <button type="button" data-a="ok" aria-label="Confirm, interact, or advance dialogue">A</button>
+  </div>
+</div>
 <p id="status" role="status" aria-live="polite"></p>
 <p id="foot">Arrows/WASD · E interact · P party · B storage · K Dex · G guide · F5 save · F9 load</p>
+</main>
 {{ game_data|json_script:"alamat-data" }}
 {{ game_config|json_script:"alamat-config" }}
 {# Cache-bust static JavaScript when map assets/placements change. #}
 <script src="{% static 'game/alamat-music.js' %}?v=20261113-audio"></script>
-<script src="{% static 'game/alamat.js' %}?v=20261113-shrine-replacement-2"></script>
+<script src="{% static 'game/alamat.js' %}?v=20261114-mobile1"></script>
 </body></html>
