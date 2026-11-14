@@ -229,6 +229,7 @@ The game also shows a client self-test count beneath the canvas. Test results an
 - [Village Building Replacement](docs/VILLAGE_BUILDING_REPLACEMENT.md)
 - [Game Music](docs/GAME_MUSIC.md)
 - [Play on Another Device — Transfer and Backup Guide](docs/INSTALL_ON_ANOTHER_DEVICE.md)
+- [Mobile Play and Touch Controls](docs/MOBILE_PLAY_GUIDE.md)
 - [Folklore Research and Naming Policy](docs/FOLKLORE_POLICY.md)
 - [Backend README](README_BACKEND.md)
 - [Development Progress](PROGRESS.md)
