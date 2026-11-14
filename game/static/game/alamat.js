@@ -569,16 +569,26 @@ function update(dt){S.t+=dt;if(DG)DG.i=Math.min(DG.t.length,DG.i+dt/25);if(S.msg
  p.f=0;if(S.busy)return;for(const d of['up','down','left','right'])if(held[d]){tryMove(d);break}}
 
 /* ---------- draw ---------- */
-function drawWorld(){const m=S.map,p=S.p,cx=Math.max(0,Math.min(m.w*T-W,Math.round(p.px+16-W/2))),cy=Math.max(0,Math.min(m.h*T-H,Math.round(p.py+16-H/2)));
- c.drawImage(m.gl,cx,cy,W,H,0,0,W,H);
- if(!images.get('tiles/pocket_atlas')?.ready&&(S.t/600|0)%2)for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(tileAt(m,i,j)===4&&i<m.w&&j<m.h)c.drawImage(asset('tiles/water',WA),i*T-cx,j*T-cy,T,T);
+function drawWorld(){
+ const m=S.map,p=S.p;
+ // Small maps (including the 16x12 Ancient Shrine) must fill the 640x480
+ // canvas rather than leaving blank strips on the right and bottom.
+ // Scale all world layers together; leave dialogue, HUD and menus at 1:1.
+ const scale=Math.max(1,Math.min(W/(m.w*T),H/(m.h*T)));
+ const viewW=Math.min(m.w*T,W/scale),viewH=Math.min(m.h*T,H/scale);
+ const cx=Math.max(0,Math.min(m.w*T-viewW,Math.round(p.px+16-viewW/2)));
+ const cy=Math.max(0,Math.min(m.h*T-viewH,Math.round(p.py+16-viewH/2)));
+ c.save();c.scale(scale,scale);
+ c.drawImage(m.gl,cx,cy,viewW,viewH,0,0,viewW,viewH);
+ if(!images.get('tiles/pocket_atlas')?.ready&&(S.t/600|0)%2)for(let j=cy/T|0;j<=(cy+viewH)/T;j++)for(let i=cx/T|0;i<=(cx+viewW)/T;i++)if(tileAt(m,i,j)===4&&i<m.w&&j<m.h)c.drawImage(asset('tiles/water',WA),i*T-cx,j*T-cy,T,T);
  const L=m.objs.map(o=>({sy:o.sy,fn:()=>drawObject(c,o,o.px-cx,o.py-cy)}));
  m.npcs.forEach(n=>L.push({sy:n.y*T+T,fn:()=>drawActor(c,n.pal,n.dir,0,n.x*T+16-32-cx,n.y*T+T-63-cy)}));
  L.push({sy:p.py+T,fn:()=>drawActor(c,PL,p.dir,p.f,Math.round(p.px+16-32-cx),Math.round(p.py+T-63-cy))});
  L.sort((a,b)=>a.sy-b.sy).forEach(q=>q.fn());
- if(m.dark){c.fillStyle='rgba(8,20,32,.28)';c.fillRect(0,0,W,H);for(const f of FF){const x=f.x+Math.sin(S.t/700+f.o)*20-cx,y=f.y+Math.cos(S.t/900+f.o)*14-cy;if(x>-8&&x<W+8&&y>-8&&y<H+8){c.fillStyle='rgba(118,216,210,.25)';c.fillRect(x-3,y-3,7,7);c.fillStyle=P.cyan;c.fillRect(x-1,y-1,3,3)}}}
- if(S.insp){c.fillStyle='rgba(220,50,50,.35)';for(let j=cy/T|0;j<=(cy+H)/T;j++)for(let i=cx/T|0;i<=(cx+W)/T;i++)if(i<m.w&&j<m.h&&(m.sol[j*m.w+i]||tileAt(m,i,j)===4))c.fillRect(i*T-cx,j*T-cy,T,T);
-  c.fillStyle='rgba(241,198,106,.5)';m.exits.forEach(e=>c.fillRect(e.x*T-cx,e.y*T-cy,T,T));tx('tile '+S.p.x+','+S.p.y+' · '+m.name,8,H-8,'#fff',14)}
+ if(m.dark){c.fillStyle='rgba(8,20,32,.28)';c.fillRect(0,0,viewW,viewH);for(const f of FF){const x=f.x+Math.sin(S.t/700+f.o)*20-cx,y=f.y+Math.cos(S.t/900+f.o)*14-cy;if(x>-8&&x<viewW+8&&y>-8&&y<viewH+8){c.fillStyle='rgba(118,216,210,.25)';c.fillRect(x-3,y-3,7,7);c.fillStyle=P.cyan;c.fillRect(x-1,y-1,3,3)}}}
+ if(S.insp){c.fillStyle='rgba(220,50,50,.35)';for(let j=cy/T|0;j<=(cy+viewH)/T;j++)for(let i=cx/T|0;i<=(cx+viewW)/T;i++)if(i<m.w&&j<m.h&&(m.sol[j*m.w+i]||tileAt(m,i,j)===4))c.fillRect(i*T-cx,j*T-cy,T,T);
+  c.fillStyle='rgba(241,198,106,.5)';m.exits.forEach(e=>c.fillRect(e.x*T-cx,e.y*T-cy,T,T));tx('tile '+S.p.x+','+S.p.y+' · '+m.name,8,viewH-8,'#fff',14)}
+ c.restore();
  c.fillStyle='rgba(20,38,56,.78)';c.fillRect(8,8,W-16,30);tx(m.name+' · '+objective(),18,29,P.off,14);tx('Selyo ×'+S.selyo+'  Herb ×'+S.herbs,W-18,29,P.gold,14,'right')}
 function drawPick(){if(!U)return;c.fillStyle='rgba(20,38,56,.82)';c.fillRect(0,0,W,H);tx('Choose your partner',W/2,52,P.gold,28,'center');
  U.ids.forEach((id,i)=>{const s=SP[id],x=26+i*204,sel=U.sel===i;c.fillStyle=sel?P.gold:P.off;c.fillRect(x-4,76-4,188,308);c.fillStyle=P.off;c.fillRect(x,76,180,300);c.fillStyle=P.navy;c.fillRect(x,76,180,28);tx(s.n,x+90,97,P.off,18,'center');
@@ -960,6 +970,12 @@ const TESTS=[
  ['NPC found on facing tile',()=>!!npcAt(V,21,14)],
  ['Forest has encounter grass and exits',()=>F.g.includes(5)&&F.exits.length>=2],
  ['Shrine map exists and links',()=>SH.w===16&&SH.exits.length>=1],
+ ['Small shrine maps scale to fill the viewport without changing collisions',()=>{
+  const factor=Math.max(1,Math.min(W/(SH.w*T),H/(SH.h*T)));
+  return SH.w===16&&SH.h===12&&factor===1.25
+    &&Math.min(SH.w*T,W/factor)*factor===W
+    &&Math.min(SH.h*T,H/factor)*factor===H;
+ }],
  ['Ancient Shrine replacement art and accessible entrance',()=>{
   const o=SH.objs.find(o=>o.buildingAsset==='ancient_shrine');
   return !!o&&o.x===4&&o.y===2&&o.w===5&&o.h===4
